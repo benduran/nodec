@@ -10,7 +10,8 @@ import (
 )
 
 type NodeCArgs struct {
-	Target []string
+	NodeVersion string
+	Target      []string
 }
 
 /**
@@ -41,6 +42,11 @@ func ParseArgs() (NodeCArgs, error) {
 		"",
 		fmt.Sprintf("possible values (one or more, comma-separated): %s", strings.Join(structs.AllowedTargets, ",")),
 	)
+	nodeVersionPtr := flag.String(
+		"node-version",
+		"20.12.0",
+		"defines the version of NodeJS that will be used when compiling your standalone executable. Must be an explicit version. SemVer is not supported.",
+	)
 
 	flag.Parse()
 
@@ -48,6 +54,7 @@ func ParseArgs() (NodeCArgs, error) {
 
 	target := []string{}
 	trimmedTarget := strings.TrimSpace(*targetPtr)
+	nodeVersion := strings.TrimSpace(*nodeVersionPtr)
 
 	if len(trimmedTarget) > 0 {
 		target = targetRegexp.Split(trimmedTarget, -1)
@@ -91,7 +98,8 @@ func ParseArgs() (NodeCArgs, error) {
 	}
 
 	args := NodeCArgs{
-		Target: formattedTargets,
+		NodeVersion: nodeVersion,
+		Target:      formattedTargets,
 	}
 
 	return args, nil
