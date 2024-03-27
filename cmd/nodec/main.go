@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"nodec/internal"
+)
 
 func main() {
-	fmt.Print("Hello there!")
+	args, err := internal.ParseArgs()
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("target is %s", args.Target)
 }
