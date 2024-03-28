@@ -1,6 +1,11 @@
 package internal
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
 
 /**
 * Constructs a well-formed URL to the location
@@ -38,6 +43,38 @@ func getNodeDownloadUrl(version string, os string, arch string) string {
 /**
 * Downloads the request version of node
  */
-func DownloadNode(version string, os string, arch string) {
-	fmt.Println(getNodeDownloadUrl(version, os, arch))
+func DownloadNode(version string, osToUse string, archToUse string) {
+	downloadUrl := getNodeDownloadUrl(version, osToUse, archToUse)
+	dlMessage := fmt.Sprintf("Downloading Node.js %s for %s-%s from %s", version, osToUse, archToUse, downloadUrl)
+	fmt.Println(dlMessage)
+
+	archiveExt := ""
+	if osToUse == "macos" || osToUse == "linux" {
+		archiveExt = "tar.gz"
+	} else {
+		archiveExt = "zip"
+	}
+
+	dlFilename := fmt.Sprintf("node-%s-%s-%s.%s", version, osToUse, archToUse, archiveExt)
+
+	dlLocation, err := os.Create(dlFilename)
+	if err != nil {
+		panic(err)
+	}
+
+	defer dlLocation.Close()
+
+	res, err := http.Get(downloadUrl)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer res.Body.Close()
+
+	_, err = io.Copy(dlLocation, res.Body)
+
+	if err != nil {
+		panic(err)
+	}
 }
