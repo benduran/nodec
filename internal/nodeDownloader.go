@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 )
 
 /**
@@ -45,8 +46,6 @@ func getNodeDownloadUrl(version string, os string, arch string) string {
  */
 func DownloadNode(version string, osToUse string, archToUse string) {
 	downloadUrl := getNodeDownloadUrl(version, osToUse, archToUse)
-	dlMessage := fmt.Sprintf("Downloading Node.js %s for %s-%s from %s", version, osToUse, archToUse, downloadUrl)
-	fmt.Println(dlMessage)
 
 	archiveExt := ""
 	if osToUse == "macos" || osToUse == "linux" {
@@ -57,12 +56,19 @@ func DownloadNode(version string, osToUse string, archToUse string) {
 
 	dlFilename := fmt.Sprintf("node-%s-%s-%s.%s", version, osToUse, archToUse, archiveExt)
 
-	dlLocation, err := os.Create(dlFilename)
+	tmpFolder := os.TempDir()
+
+	dlFilePath := path.Join(tmpFolder, dlFilename)
+
+	dlLocation, err := os.Create(dlFilePath)
 	if err != nil {
 		panic(err)
 	}
 
 	defer dlLocation.Close()
+
+	dlMessage := fmt.Sprintf("Downloading Node.js %s for %s-%s from %s to %s", version, osToUse, archToUse, downloadUrl, dlFilePath)
+	fmt.Println(dlMessage)
 
 	res, err := http.Get(downloadUrl)
 
