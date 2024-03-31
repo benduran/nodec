@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"nodec/internal"
 	"strings"
 )
@@ -12,8 +13,11 @@ func main() {
 		panic(err)
 	}
 
-	for i := 0; i < len(args.Target); i++ {
-		splitTarget := strings.Split(args.Target[i], "-")
-		internal.DownloadNode(args.NodeVersion, splitTarget[0], splitTarget[1])
+	for _, tgt := range args.Target {
+		splitTarget := strings.Split(tgt, "-")
+		downloadResult := internal.DownloadNode(args.NodeVersion, splitTarget[0], splitTarget[1])
+		fmt.Printf("Downloaded node to %s", downloadResult.DownloadPath)
 	}
+
+	compilerRenderLocation := internal.RenderCompiler()
 }

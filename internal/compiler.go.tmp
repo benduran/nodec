@@ -1,0 +1,79 @@
+package main
+
+import (
+	"bytes"
+	_ "embed"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"path"
+)
+
+//go:embed node
+var nodeBinary []byte
+
+func main() {
+	// Write the embedded Node.js binary to a temporary file
+	tmpNodePath, err := writeTempFile(nodeBinary, "node")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to write temporary node binary: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Get command line arguments, excluding the name of the program itself
+	args := os.Args[1:]
+
+	// Create a command with the arguments
+	cmd := exec.Command(tmpNodePath, args...)
+
+	// Set up the pipes
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Start the command
+	err = cmd.Start()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to start node: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Wait for the command to finish
+	err = cmd.Wait()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "node exited with error: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func writeTempFile(data []byte, prefix string) (string, error) {
+	tmpFilePath := path.Join(os.TempDir(), "nodec", "extracted")
+	err := os.MkdirAll(tmpFilePath, 0755)
+
+	if err != nil {
+		return "", err
+	}
+
+	tmpFile, err := os.Create(tmpFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = io.Copy(tmpFile, bytes.NewReader(data))
+	if err != nil {
+		return "", err
+	}
+
+	err = tmpFile.Close()
+	if err != nil {
+		return "", err
+	}
+
+	err = os.Chmod(tmpFile.Name(), 0755)
+	if err != nil {
+		return "", err
+	}
+
+	return tmpFile.Name(), nil
+}

@@ -41,10 +41,17 @@ func getNodeDownloadUrl(version string, os string, arch string) string {
 	return fmt.Sprintf("https://nodejs.org/dist/v%s/node-v%s-%s-%s.%s", version, version, osToDL, archToDL, ext)
 }
 
+type DownloadNodeResult struct {
+	Arch         string
+	DownloadPath string
+	OS           string
+	Version      string
+}
+
 /**
 * Downloads the request version of node
  */
-func DownloadNode(version string, osToUse string, archToUse string) {
+func DownloadNode(version string, osToUse string, archToUse string) *DownloadNodeResult {
 	downloadUrl := getNodeDownloadUrl(version, osToUse, archToUse)
 
 	archiveExt := ""
@@ -56,7 +63,11 @@ func DownloadNode(version string, osToUse string, archToUse string) {
 
 	dlFilename := fmt.Sprintf("node-%s-%s-%s.%s", version, osToUse, archToUse, archiveExt)
 
-	tmpFolder := os.TempDir()
+	tmpFolder := path.Join(os.TempDir(), "nodec")
+	err := os.MkdirAll(tmpFolder, 0755)
+	if err != nil {
+		panic(err)
+	}
 
 	dlFilePath := path.Join(tmpFolder, dlFilename)
 
@@ -83,4 +94,13 @@ func DownloadNode(version string, osToUse string, archToUse string) {
 	if err != nil {
 		panic(err)
 	}
+
+	result := DownloadNodeResult{
+		Arch:         archToUse,
+		DownloadPath: dlFilePath,
+		OS:           osToUse,
+		Version:      version,
+	}
+
+	return &result
 }
