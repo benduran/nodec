@@ -16,8 +16,13 @@ func main() {
 	for _, tgt := range args.Target {
 		splitTarget := strings.Split(tgt, "-")
 		downloadResult := internal.DownloadNode(args.NodeVersion, splitTarget[0], splitTarget[1])
-		fmt.Printf("Downloaded node to %s", downloadResult.DownloadPath)
-	}
 
-	compilerRenderLocation := internal.RenderCompiler()
+		downloadedMsg := fmt.Sprintf("Downloaded node to %s", downloadResult.DownloadPath)
+		fmt.Println(downloadedMsg)
+
+		compilerRenderLocation := internal.RenderCompiler(downloadResult.DownloadFolder)
+
+		renderedMsg := fmt.Sprintf("Rendered the nodec compiler to %s", compilerRenderLocation)
+		fmt.Println(renderedMsg)
+	}
 }

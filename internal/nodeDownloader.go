@@ -42,10 +42,11 @@ func getNodeDownloadUrl(version string, os string, arch string) string {
 }
 
 type DownloadNodeResult struct {
-	Arch         string
-	DownloadPath string
-	OS           string
-	Version      string
+	Arch           string
+	DownloadFolder string
+	DownloadPath   string
+	OS             string
+	Version        string
 }
 
 /**
@@ -61,9 +62,9 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 		archiveExt = "zip"
 	}
 
-	dlFilename := fmt.Sprintf("node-%s-%s-%s.%s", version, osToUse, archToUse, archiveExt)
+	dlFilename := fmt.Sprintf("node.%s", archiveExt)
 
-	tmpFolder := path.Join(os.TempDir(), "nodec")
+	tmpFolder := path.Join(os.TempDir(), "nodec", fmt.Sprintf("%s-%s-%s", version, osToUse, archToUse))
 	err := os.MkdirAll(tmpFolder, 0755)
 	if err != nil {
 		panic(err)
@@ -96,10 +97,11 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 	}
 
 	result := DownloadNodeResult{
-		Arch:         archToUse,
-		DownloadPath: dlFilePath,
-		OS:           osToUse,
-		Version:      version,
+		Arch:           archToUse,
+		DownloadFolder: path.Dir(dlFilePath),
+		DownloadPath:   dlFilePath,
+		OS:             osToUse,
+		Version:        version,
 	}
 
 	return &result
