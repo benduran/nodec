@@ -15,7 +15,10 @@ func main() {
 
 	for _, tgt := range args.Target {
 		splitTarget := strings.Split(tgt, "-")
-		downloadResult := internal.DownloadNode(args.NodeVersion, splitTarget[0], splitTarget[1])
+		osToUse := splitTarget[0]
+		archToUse := splitTarget[1]
+
+		downloadResult := internal.DownloadNode(args.NodeVersion, osToUse, archToUse)
 
 		downloadedMsg := fmt.Sprintf("Downloaded node to %s", downloadResult.DownloadPath)
 		fmt.Println(downloadedMsg)
@@ -24,5 +27,9 @@ func main() {
 
 		renderedMsg := fmt.Sprintf("Rendered the nodec compiler to %s", compilerRenderLocation)
 		fmt.Println(renderedMsg)
+
+		renderedMsg = fmt.Sprintf("compiling target %s-%s", downloadResult.OS, downloadResult.Arch)
+		fmt.Println(renderedMsg)
+		internal.CompileBinary(osToUse, archToUse, downloadResult.DownloadFolder)
 	}
 }
