@@ -96,10 +96,19 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 		panic(err)
 	}
 
+	// everything was good up to this point, so now we need to extract the archive
+	// to get the underlying node binary that's contained within
+	downloadFolder := path.Dir(dlFilePath)
+
+	extractedFolder, err := ExtractArchive(dlFilePath, downloadFolder)
+	if err != nil {
+		panic(err)
+	}
+
 	result := DownloadNodeResult{
 		Arch:           archToUse,
-		DownloadFolder: path.Dir(dlFilePath),
-		DownloadPath:   dlFilePath,
+		DownloadFolder: extractedFolder,
+		DownloadPath:   path.Join(downloadFolder, "node"),
 		OS:             osToUse,
 		Version:        version,
 	}

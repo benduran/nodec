@@ -2,11 +2,12 @@ package internal
 
 import (
 	_ "embed"
+	"fmt"
 	"os"
 	"path"
 )
 
-// embed compiler.go.tmp
+//go:embed compiler.go.tmp
 var compilerCode []byte
 
 /**
@@ -18,6 +19,10 @@ func RenderCompiler(dlFolder string) string {
 	err := os.MkdirAll(path.Dir(compilerRenderLocation), 0755)
 	if err != nil {
 		panic(err)
+	}
+
+	if len(compilerCode) <= 0 {
+		panic(fmt.Errorf("unable to render the compiler code because it was not embedded properly"))
 	}
 
 	err = os.WriteFile(compilerRenderLocation, compilerCode, 0755)
