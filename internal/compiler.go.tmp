@@ -13,6 +13,10 @@ import (
 //go:embed node
 var nodeBinary []byte
 
+func cleanupNode(tmpNodePath string) error {
+	return os.Remove(tmpNodePath)
+}
+
 func main() {
 	// Write the embedded Node.js binary to a temporary file
 	tmpNodePath, err := writeTempFile(nodeBinary, "node")
@@ -32,6 +36,9 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
+	// always destroy the node.js stuffs when we're done with it
+	defer cleanupNode(tmpNodePath)
+
 	// Start the command
 	err = cmd.Start()
 	if err != nil {
@@ -48,12 +55,14 @@ func main() {
 }
 
 func writeTempFile(data []byte, prefix string) (string, error) {
-	tmpFilePath := path.Join(os.TempDir(), "nodec", "extracted")
-	err := os.MkdirAll(tmpFilePath, 0755)
+	tmpFileDir := path.Join(os.TempDir(), "nodec", "extracted")
+	err := os.MkdirAll(tmpFileDir, 0755)
 
 	if err != nil {
 		return "", err
 	}
+
+	tmpFilePath := path.Join(tmpFileDir, "node")
 
 	tmpFile, err := os.Create(tmpFilePath)
 	if err != nil {
