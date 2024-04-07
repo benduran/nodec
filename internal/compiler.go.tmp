@@ -14,6 +14,9 @@ import (
 //go:embed node.gz
 var nodeBinaryCompressed []byte
 
+//go:embed bundled.js
+var jsapp []byte
+
 func cleanupNode(tmpNodePath string) error {
 	return os.Remove(tmpNodePath)
 }

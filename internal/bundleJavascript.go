@@ -12,7 +12,7 @@ import (
 // file to a single bundle with all dependencies included,
 // and returns the path to the outputted file
 func BundleJavaScript(entry, appName, nodeVersion, destDir string) string {
-	outputFile := path.Join(destDir, fmt.Sprintf("%s.js", appName))
+	outputFile := path.Join(destDir, "bundled.js")
 
 	buildOpts := api.BuildOptions{
 		Bundle:      true,
@@ -20,8 +20,9 @@ func BundleJavaScript(entry, appName, nodeVersion, destDir string) string {
 		Outfile:     outputFile,
 		Platform:    api.PlatformNode,
 		Target:      api.ES2022,
+		Write:       true,
 	}
-	fmt.Println(buildOpts.EntryPoints)
+
 	buildResult := api.Build(buildOpts)
 
 	errMsg := ""
