@@ -15,7 +15,29 @@ func CompileBinary(appName, osToUse, arch, downloadFolder string) {
 
 	pwd := GetCWD()
 
+	compileEnv := os.Environ()
+
+	goTargetArch := ""
+	if arch == "x64" {
+		goTargetArch = "amd64"
+	} else {
+		goTargetArch = arch
+	}
+
+	goTargetOs := ""
+	if osToUse == "macos" {
+		goTargetOs = "darwin"
+	} else if osToUse == "win" {
+		goTargetOs = "windows"
+	} else {
+		goTargetOs = "linux"
+	}
+
+	compileEnv = append(compileEnv, fmt.Sprintf("GOARCH=%s", goTargetArch))
+	compileEnv = append(compileEnv, fmt.Sprintf("GOOS=%s", goTargetOs))
+
 	cmd := exec.Command("go", []string{"build", entrypoint}...)
+	cmd.Env = compileEnv
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
