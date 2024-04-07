@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	_ "embed"
 	"fmt"
 	"io"
@@ -10,14 +11,17 @@ import (
 	"path"
 )
 
-//go:embed node
-var nodeBinary []byte
+//go:embed node.gz
+var nodeBinaryCompressed []byte
 
 func cleanupNode(tmpNodePath string) error {
 	return os.Remove(tmpNodePath)
 }
 
 func main() {
+	// inflate the gzip-compressed application
+	nodeBinary, err := decompressGzip(nodeBinaryCompressed)
+
 	// Write the embedded Node.js binary to a temporary file
 	tmpNodePath, err := writeTempFile(nodeBinary, "node")
 	if err != nil {
@@ -85,4 +89,19 @@ func writeTempFile(data []byte, prefix string) (string, error) {
 	}
 
 	return tmpFile.Name(), nil
+}
+
+func decompressGzip(data []byte) ([]byte, error) {
+	reader, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, reader); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
