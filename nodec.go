@@ -28,6 +28,10 @@ func main() {
 		renderedMsg := fmt.Sprintf("Rendered the nodec compiler to %s", compilerRenderLocation)
 		fmt.Println(renderedMsg)
 
+		bundledCodePath := internal.BundleJavaScript(args.Entry, args.AppName, args.NodeVersion, downloadResult.DownloadFolder)
+		renderedMsg = fmt.Sprintf("Bundled JS & TS code to %s", bundledCodePath)
+		fmt.Println(renderedMsg)
+
 		renderedMsg = fmt.Sprintf("compiling target %s-%s", downloadResult.OS, downloadResult.Arch)
 		fmt.Println(renderedMsg)
 		internal.CompileBinary(args.AppName, osToUse, archToUse, downloadResult.DownloadFolder)

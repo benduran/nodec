@@ -11,6 +11,7 @@ import (
 
 type NodeCArgs struct {
 	AppName     string
+	Entry       string
 	NodeVersion string
 	Target      []string
 }
@@ -49,8 +50,11 @@ func ParseArgs() (NodeCArgs, error) {
 		"20.12.0",
 		"defines the version of NodeJS that will be used when compiling your standalone executable. Must be an explicit version. SemVer is not supported.",
 	)
+	entryPtr := flag.String("entry", "", "(Required): The entrypoint to your JavaScript or TypeScript application")
 
 	flag.Parse()
+
+	entry := *entryPtr
 
 	targetRegexp := regexp.MustCompile(`\s*,\s*`)
 
@@ -101,6 +105,7 @@ func ParseArgs() (NodeCArgs, error) {
 
 	args := NodeCArgs{
 		AppName:     *appNamePtr,
+		Entry:       entry,
 		NodeVersion: nodeVersion,
 		Target:      formattedTargets,
 	}
