@@ -30,6 +30,6 @@ func main() {
 
 		renderedMsg = fmt.Sprintf("compiling target %s-%s", downloadResult.OS, downloadResult.Arch)
 		fmt.Println(renderedMsg)
-		internal.CompileBinary(osToUse, archToUse, downloadResult.DownloadFolder)
+		internal.CompileBinary(args.AppName, osToUse, archToUse, downloadResult.DownloadFolder)
 	}
 }

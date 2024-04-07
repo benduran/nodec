@@ -10,6 +10,7 @@ import (
 )
 
 type NodeCArgs struct {
+	AppName     string
 	NodeVersion string
 	Target      []string
 }
@@ -37,6 +38,7 @@ func validateTarget(tgt string) bool {
 * and actually parses them
  */
 func ParseArgs() (NodeCArgs, error) {
+	appNamePtr := flag.String("name", "my-app", "the final outputted filename that represents your compiled application")
 	targetPtr := flag.String(
 		"target",
 		"",
@@ -98,6 +100,7 @@ func ParseArgs() (NodeCArgs, error) {
 	}
 
 	args := NodeCArgs{
+		AppName:     *appNamePtr,
 		NodeVersion: nodeVersion,
 		Target:      formattedTargets,
 	}
