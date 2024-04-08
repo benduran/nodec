@@ -34,6 +34,9 @@ func main() {
 
 		renderedMsg = fmt.Sprintf("compiling target %s-%s", downloadResult.OS, downloadResult.Arch)
 		fmt.Println(renderedMsg)
-		internal.CompileBinary(args.AppName, osToUse, archToUse, downloadResult.DownloadFolder)
+		compiledResult := internal.CompileBinary(args.AppName, osToUse, archToUse, downloadResult.DownloadFolder)
+
+		renderedMsg = fmt.Sprintf("Success! Your application has been compiled and is available at %s", compiledResult)
+		fmt.Println(renderedMsg)
 	}
 }

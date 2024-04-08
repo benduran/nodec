@@ -35,5 +35,7 @@ func BundleJavaScript(entry, appName, nodeVersion, destDir string) string {
 		panic(fmt.Errorf(errMsg))
 	}
 
-	return outputFile
+	compressedFilePath := fmt.Sprintf("%s.gz", outputFile)
+
+	return CompressFile(outputFile, compressedFilePath)
 }

@@ -14,16 +14,32 @@ import (
 //go:embed node.gz
 var nodeBinaryCompressed []byte
 
-//go:embed bundled.js
-var jsapp []byte
+//go:embed bundled.js.gz
+var jsappCompressed []byte
 
-func cleanupNode(tmpNodePath string) error {
-	return os.Remove(tmpNodePath)
+func cleanup(tmpNodePath, tmpJsBundlePath string) error {
+	err := os.Remove(tmpNodePath)
+	if err != nil {
+		return err
+	}
+
+	return os.Remove(tmpJsBundlePath)
 }
 
 func main() {
 	// inflate the gzip-compressed application
 	nodeBinary, err := decompressGzip(nodeBinaryCompressed)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// infalte the gzip-compressed JS bundle
+	jsBundle, err := decompressGzip(jsappCompressed)
+
+	if err != nil {
+		panic(err)
+	}
 
 	// Write the embedded Node.js binary to a temporary file
 	tmpNodePath, err := writeTempFile(nodeBinary, "node")
@@ -32,8 +48,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	tmpJsBundlePath, err := writeTempFile(jsBundle, "bundle.js")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to inflate bundled javascript: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Get command line arguments, excluding the name of the program itself
 	args := os.Args[1:]
+
+	// place the bundle.js as the script target via the last argument
+	args = append(args, tmpJsBundlePath)
 
 	// Create a command with the arguments
 	cmd := exec.Command(tmpNodePath, args...)
@@ -44,7 +69,7 @@ func main() {
 	cmd.Stderr = os.Stderr
 
 	// always destroy the node.js stuffs when we're done with it
-	defer cleanupNode(tmpNodePath)
+	defer cleanup(tmpNodePath, tmpJsBundlePath)
 
 	// Start the command
 	err = cmd.Start()
@@ -61,7 +86,7 @@ func main() {
 	}
 }
 
-func writeTempFile(data []byte, prefix string) (string, error) {
+func writeTempFile(data []byte, filename string) (string, error) {
 	tmpFileDir := path.Join(os.TempDir(), "nodec", "extracted")
 	err := os.MkdirAll(tmpFileDir, 0755)
 
@@ -69,7 +94,7 @@ func writeTempFile(data []byte, prefix string) (string, error) {
 		return "", err
 	}
 
-	tmpFilePath := path.Join(tmpFileDir, "node")
+	tmpFilePath := path.Join(tmpFileDir, filename)
 
 	tmpFile, err := os.Create(tmpFilePath)
 	if err != nil {

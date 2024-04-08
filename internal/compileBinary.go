@@ -9,7 +9,7 @@ import (
 
 // given the os, CPU and path to the prepped contents,
 // compiles the standalone binary for the user
-func CompileBinary(appName, osToUse, arch, downloadFolder string) {
+func CompileBinary(appName, osToUse, arch, downloadFolder string) string {
 	// go must be installed and available in the user's $PATH
 	entrypoint := path.Join(downloadFolder, "compiler.go")
 
@@ -56,4 +56,6 @@ func CompileBinary(appName, osToUse, arch, downloadFolder string) {
 	if err != nil {
 		panic(err)
 	}
+
+	return newFileName
 }

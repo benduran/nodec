@@ -16,6 +16,7 @@ var compilerCode []byte
  */
 func RenderCompiler(dlFolder string) string {
 	compilerRenderLocation := path.Join(dlFolder, "compiler.go")
+
 	err := os.MkdirAll(path.Dir(compilerRenderLocation), 0755)
 	if err != nil {
 		panic(err)
@@ -24,6 +25,9 @@ func RenderCompiler(dlFolder string) string {
 	if len(compilerCode) <= 0 {
 		panic(fmt.Errorf("unable to render the compiler code because it was not embedded properly"))
 	}
+
+	// always remove any existing compiler file at this location
+	os.Remove(compilerRenderLocation)
 
 	err = os.WriteFile(compilerRenderLocation, compilerCode, 0755)
 

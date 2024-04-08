@@ -100,15 +100,15 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 	// to get the underlying node binary that's contained within
 	downloadFolder := path.Dir(dlFilePath)
 
-	extractedFolder, err := ExtractArchive(osToUse, dlFilePath, downloadFolder)
+	extractedNodePath, err := ExtractArchive(osToUse, dlFilePath, downloadFolder)
 	if err != nil {
 		panic(err)
 	}
 
 	result := DownloadNodeResult{
 		Arch:           archToUse,
-		DownloadFolder: extractedFolder,
-		DownloadPath:   path.Join(downloadFolder, "node"),
+		DownloadFolder: downloadFolder,
+		DownloadPath:   extractedNodePath,
 		OS:             osToUse,
 		Version:        version,
 	}

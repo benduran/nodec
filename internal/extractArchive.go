@@ -119,51 +119,14 @@ func placeNodeAtRootOfDest(osToUse, destDir string) (string, error) {
 		return "", err
 	}
 
-	os.Rename(matches[0], path.Join(destDir, "node"))
-
-	return destDir, nil
-}
-
-// gzip compresses the node binary that was just downloaded.
-// this is to reduce the overall filesize of the resulting single
-// compiled binary
-func gzipNode(destDir string) (string, error) {
-	inputNode := path.Join(destDir, "node")
-
-	originalNode, err := os.Open(inputNode)
+	outputFilePath := path.Join(destDir, "node")
+	err = os.Rename(matches[0], outputFilePath)
 
 	if err != nil {
 		return "", err
 	}
 
-	defer originalNode.Close()
-
-	outputCompressedFilePath := path.Join(destDir, "node.gz")
-
-	gzipFile, err := os.Create(outputCompressedFilePath)
-
-	if err != nil {
-		return "", err
-	}
-
-	defer gzipFile.Close()
-
-	gzipWriter := gzip.NewWriter(gzipFile)
-	defer gzipWriter.Close()
-
-	_, err = io.Copy(gzipWriter, originalNode)
-
-	if err != nil {
-		return "", err
-	}
-
-	err = gzipWriter.Flush()
-
-	if err != nil {
-		return "", err
-	}
-
-	return destDir, nil
+	return outputFilePath, nil
 }
 
 // ExtractArchive extracts a .tar.gz or .zip archive to the specified destination directory.
@@ -192,10 +155,12 @@ func ExtractArchive(osToUse, archivePath, destDir string) (string, error) {
 
 	// extract path will have the node binfile SOMEWHERE inside of it, giggity.
 	// we need to move the binfile to be at the root of this extracted folder
-	_, err = placeNodeAtRootOfDest(osToUse, extractPath)
+	nodeFilePath, err := placeNodeAtRootOfDest(osToUse, extractPath)
 
 	if err != nil {
 		return "", err
 	}
-	return gzipNode(destDir)
+
+	outputGzippedPath := path.Join(destDir, "node.gz")
+	return CompressFile(nodeFilePath, outputGzippedPath), nil
 }
