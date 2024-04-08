@@ -51,7 +51,8 @@ func CompileBinary(appName, osToUse, arch, downloadFolder string) string {
 
 	newFileName := fmt.Sprintf("%s-%s-%s", appName, osToUse, arch)
 
-	err = os.Rename(path.Join(pwd, "compiler"), path.Join(pwd, newFileName))
+	renamedFilePath := path.Join(pwd, newFileName)
+	err = os.Rename(path.Join(pwd, "compiler"), renamedFilePath)
 
 	if err != nil {
 		panic(err)

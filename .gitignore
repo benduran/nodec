@@ -23,3 +23,4 @@ go.work
 # Ignore the embedded node
 compiler
 nodec
+node_modules

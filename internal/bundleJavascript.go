@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -13,6 +14,8 @@ import (
 // and returns the path to the outputted file
 func BundleJavaScript(entry, appName, nodeVersion, destDir string) string {
 	outputFile := path.Join(destDir, "bundled.js")
+
+	os.Remove(outputFile)
 
 	buildOpts := api.BuildOptions{
 		Bundle:      true,

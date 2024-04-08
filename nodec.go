@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"nodec/internal"
+	"os"
 	"strings"
 )
 
@@ -19,6 +20,9 @@ func main() {
 		archToUse := splitTarget[1]
 
 		downloadResult := internal.DownloadNode(args.NodeVersion, osToUse, archToUse)
+
+		// when this is done, always cleanup the folder
+		defer os.Remove(downloadResult.DownloadFolder)
 
 		downloadedMsg := fmt.Sprintf("Downloaded node to %s", downloadResult.DownloadPath)
 		fmt.Println(downloadedMsg)
