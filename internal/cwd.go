@@ -5,12 +5,12 @@ import (
 )
 
 // Gets the CWD to where this application is running
-func GetCWD() string {
+func GetCWD() (string, error) {
 	pwd, err := os.Getwd()
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return pwd
+	return pwd, nil
 }

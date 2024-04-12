@@ -52,7 +52,7 @@ type DownloadNodeResult struct {
 /**
 * Downloads the request version of node
  */
-func DownloadNode(version string, osToUse string, archToUse string) *DownloadNodeResult {
+func DownloadNode(version string, osToUse string, archToUse string) (*DownloadNodeResult, error) {
 	downloadUrl := getNodeDownloadUrl(version, osToUse, archToUse)
 
 	archiveExt := ""
@@ -67,14 +67,14 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 	tmpFolder := path.Join(os.TempDir(), "nodec", fmt.Sprintf("%s-%s-%s", version, osToUse, archToUse))
 	err := os.MkdirAll(tmpFolder, 0755)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	dlFilePath := path.Join(tmpFolder, dlFilename)
 
 	dlLocation, err := os.Create(dlFilePath)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	defer dlLocation.Close()
@@ -85,7 +85,7 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 	res, err := http.Get(downloadUrl)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	defer res.Body.Close()
@@ -93,7 +93,7 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 	_, err = io.Copy(dlLocation, res.Body)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// everything was good up to this point, so now we need to extract the archive
@@ -102,7 +102,7 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 
 	extractedNodePath, err := ExtractArchive(osToUse, dlFilePath, downloadFolder)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	result := DownloadNodeResult{
@@ -113,5 +113,5 @@ func DownloadNode(version string, osToUse string, archToUse string) *DownloadNod
 		Version:        version,
 	}
 
-	return &result
+	return &result, nil
 }

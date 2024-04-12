@@ -31,14 +31,16 @@ func main() {
 	nodeBinary, err := decompressGzip(nodeBinaryCompressed)
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	// infalte the gzip-compressed JS bundle
 	jsBundle, err := decompressGzip(jsappCompressed)
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	// Write the embedded Node.js binary to a temporary file

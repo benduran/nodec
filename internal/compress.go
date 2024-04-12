@@ -9,11 +9,11 @@ import (
 
 // compresses a given input file with gzip compression.
 // if successful, returns its output file path
-func CompressFile(inputFilePath, outputFilePath string) string {
+func CompressFile(inputFilePath, outputFilePath string) (string, error) {
 	originalNode, err := os.Open(inputFilePath)
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	defer originalNode.Close()
@@ -23,7 +23,7 @@ func CompressFile(inputFilePath, outputFilePath string) string {
 	gzipFile, err := os.Create(outputCompressedFilePath)
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	defer gzipFile.Close()
@@ -34,14 +34,14 @@ func CompressFile(inputFilePath, outputFilePath string) string {
 	_, err = io.Copy(gzipWriter, originalNode)
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	err = gzipWriter.Flush()
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return outputFilePath
+	return outputFilePath, nil
 }

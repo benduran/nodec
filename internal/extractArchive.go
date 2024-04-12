@@ -162,5 +162,5 @@ func ExtractArchive(osToUse, archivePath, destDir string) (string, error) {
 	}
 
 	outputGzippedPath := path.Join(destDir, "node.gz")
-	return CompressFile(nodeFilePath, outputGzippedPath), nil
+	return CompressFile(nodeFilePath, outputGzippedPath)
 }

@@ -9,11 +9,15 @@ import (
 
 // given the os, CPU and path to the prepped contents,
 // compiles the standalone binary for the user
-func CompileBinary(appName, osToUse, arch, downloadFolder string) string {
+func CompileBinary(appName, osToUse, arch, downloadFolder string) (string, error) {
 	// go must be installed and available in the user's $PATH
 	entrypoint := path.Join(downloadFolder, "compiler.go")
 
-	pwd := GetCWD()
+	pwd, err := GetCWD()
+
+	if err != nil {
+		return "", err
+	}
 
 	compileEnv := os.Environ()
 
@@ -42,9 +46,9 @@ func CompileBinary(appName, osToUse, arch, downloadFolder string) string {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	err := cmd.Start()
+	err = cmd.Start()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	// rename the compiler binary to match the user's desired app-name plus OS & Arch
@@ -55,8 +59,8 @@ func CompileBinary(appName, osToUse, arch, downloadFolder string) string {
 	err = os.Rename(path.Join(pwd, "compiler"), renamedFilePath)
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return newFileName
+	return newFileName, nil
 }

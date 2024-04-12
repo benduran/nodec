@@ -12,7 +12,7 @@ import (
 // using the ESbuild API, compiles a TypeScript or JavaScript
 // file to a single bundle with all dependencies included,
 // and returns the path to the outputted file
-func BundleJavaScript(entry, appName, nodeVersion, destDir string) string {
+func BundleJavaScript(entry, appName, nodeVersion, destDir string) (string, error) {
 	outputFile := path.Join(destDir, "bundled.js")
 
 	os.Remove(outputFile)
@@ -35,7 +35,7 @@ func BundleJavaScript(entry, appName, nodeVersion, destDir string) string {
 	errMsg = strings.TrimSpace(errMsg)
 
 	if len(errMsg) > 0 {
-		panic(fmt.Errorf(errMsg))
+		return "", fmt.Errorf(errMsg)
 	}
 
 	compressedFilePath := fmt.Sprintf("%s.gz", outputFile)
