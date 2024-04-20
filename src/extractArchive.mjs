@@ -1,7 +1,10 @@
+import decompress from 'decompress';
+import decompressTarxz from 'decompress-tarxz';
 import extractZip from 'extract-zip';
+import glob from 'fast-glob';
 import fs from 'fs-extra';
 import path from 'path';
-import tar from 'tar-stream';
+import * as tar from 'tar';
 
 import { getTempFolder } from './getTempFolder.mjs';
 
@@ -10,39 +13,27 @@ import { getTempFolder } from './getTempFolder.mjs';
  * to the nodec temp folder
  * @param {string} archivePath
  */
-export function extractArchive(archivePath) {
-  return new Promise(async (resolve, reject) => {
-    const dest = path.join(getTempFolder());
-    console.info(`Extracting ${archivePath} to ${dest}`);
-    if (archivePath.endsWith('.zip')) {
-      try {
-        await extractZip(archivePath, { dir: dest });
-        return resolve();
-      } catch (error) {
-        reject(error);
-      }
-    }
-    const extract = tar.extract();
+export async function extractArchive(archivePath) {
+  const dest = path.join(getTempFolder(), path.basename(archivePath).replace(/((\.tar)?(\.(xz|gz))|(\.zip))$/, ''));
+  await fs.ensureDir(dest);
 
-    extract.on('entry', (header, stream, next) => {
-      const filePath = `${getTempFolder()}/${header.name}`;
-      if (header.type === 'file') {
-        stream.pipe(fs.createWriteStream(filePath));
-      } else if (header.type === 'directory') {
-        fs.mkdirSync(filePath, { recursive: true });
-      }
-      stream.on('end', next);
-      stream.resume();
+  console.info(`Extracting ${archivePath} to ${dest}`);
+
+  if (archivePath.endsWith('.zip')) await extractZip(archivePath, { dir: dest });
+  else if (archivePath.endsWith('.xz')) {
+    await decompress(archivePath, dest, {
+      plugins: [decompressTarxz()],
     });
+  } else await tar.x({ file: archivePath, C: dest });
 
-    extract.on('finish', () => {
-      resolve();
-    });
+  const nixMatches = await glob(path.join(dest, '**', 'bin', 'node'), { absolute: true, onlyFiles: true });
+  const winMatches = await glob(path.join(dest, '**', 'node.exe'), { absolute: true, onlyFiles: true });
 
-    extract.on('error', err => {
-      reject(err);
-    });
+  const nodePath = nixMatches[0] || winMatches[0];
 
-    fs.createReadStream(archivePath).pipe(zlib.createGunzip()).pipe(extract);
-  });
+  if (!nodePath) {
+    throw new Error(`No node executable was found to extract in the archive rendered in "${archivePath}"`);
+  }
+
+  return nodePath;
 }
