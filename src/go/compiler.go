@@ -8,7 +8,9 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path"
+	"syscall"
 )
 
 //go:embed node.gz
@@ -17,13 +19,59 @@ var nodeBinaryCompressed []byte
 //go:embed bundled.js.gz
 var jsappCompressed []byte
 
+// cleans up the extracted executables, and ignores any errors
 func cleanup(tmpNodePath, tmpJsBundlePath string) error {
-	err := os.Remove(tmpNodePath)
-	if err != nil {
-		return err
-	}
+	os.Remove(tmpNodePath)
 
 	return os.Remove(tmpJsBundlePath)
+}
+
+func writeTempFile(data []byte, filename string) (string, error) {
+	tmpFileDir := path.Join(os.TempDir(), "nodec", "extracted")
+	err := os.MkdirAll(tmpFileDir, 0755)
+
+	if err != nil {
+		return "", err
+	}
+
+	tmpFilePath := path.Join(tmpFileDir, filename)
+
+	tmpFile, err := os.Create(tmpFilePath)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = io.Copy(tmpFile, bytes.NewReader(data))
+	if err != nil {
+		return "", err
+	}
+
+	err = tmpFile.Close()
+	if err != nil {
+		return "", err
+	}
+
+	err = os.Chmod(tmpFile.Name(), 0755)
+	if err != nil {
+		return "", err
+	}
+
+	return tmpFile.Name(), nil
+}
+
+func decompressGzip(data []byte) ([]byte, error) {
+	reader, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, reader); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 func main() {
@@ -73,6 +121,22 @@ func main() {
 	// always destroy the node.js stuffs when we're done with it
 	defer cleanup(tmpNodePath, tmpJsBundlePath)
 
+	// bind signals to listen to SIG* events so we can clean things up
+	signchl := make(chan os.Signal, 1)
+	signal.Notify(signchl)
+	exitchnl := make(chan int)
+
+	go func() {
+		for {
+			s := <-signchl
+			if s == syscall.SIGTERM || s == syscall.SIGINT || s == syscall.SIGKILL {
+				cleanup(tmpNodePath, tmpJsBundlePath)
+			}
+			exitcode := <-exitchnl
+			os.Exit(exitcode)
+		}
+	}()
+
 	// Start the command
 	err = cmd.Start()
 	if err != nil {
@@ -86,52 +150,4 @@ func main() {
 		fmt.Fprintf(os.Stderr, "node exited with error: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-func writeTempFile(data []byte, filename string) (string, error) {
-	tmpFileDir := path.Join(os.TempDir(), "nodec", "extracted")
-	err := os.MkdirAll(tmpFileDir, 0755)
-
-	if err != nil {
-		return "", err
-	}
-
-	tmpFilePath := path.Join(tmpFileDir, filename)
-
-	tmpFile, err := os.Create(tmpFilePath)
-	if err != nil {
-		return "", err
-	}
-
-	_, err = io.Copy(tmpFile, bytes.NewReader(data))
-	if err != nil {
-		return "", err
-	}
-
-	err = tmpFile.Close()
-	if err != nil {
-		return "", err
-	}
-
-	err = os.Chmod(tmpFile.Name(), 0755)
-	if err != nil {
-		return "", err
-	}
-
-	return tmpFile.Name(), nil
-}
-
-func decompressGzip(data []byte) ([]byte, error) {
-	reader, err := gzip.NewReader(bytes.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-	defer reader.Close()
-
-	buf := new(bytes.Buffer)
-	if _, err := io.Copy(buf, reader); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
 }
