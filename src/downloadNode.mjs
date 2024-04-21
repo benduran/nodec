@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
 
+import { gzipCompress } from './compress.mjs';
 import { extractNodeArchive } from './extractNodeArchive.mjs';
 import { getTempFolder } from './getTempFolder.mjs';
 
@@ -40,5 +41,7 @@ export async function downloadNode(version, target) {
 
   const nodePath = await extractNodeArchive(downloadPath);
 
-  return nodePath;
+  const compressedNodePath = await gzipCompress(nodePath);
+
+  return compressedNodePath;
 }

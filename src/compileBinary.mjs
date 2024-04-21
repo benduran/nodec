@@ -29,14 +29,17 @@ export async function compileBinary(bundlePath, nodePath, target, appName) {
   const goEntryTemplate = await fs.readFile(path.join(__dirname, 'go', 'compiler.go'), 'utf-8');
 
   const goEntryTmpPath = path.join(path.dirname(nodePath), 'compiler.go');
-  await fs.write(goEntryTemplate, goEntryTemplate, 'utf-8');
+  await fs.writeFile(goEntryTmpPath, goEntryTemplate, 'utf-8');
 
   await execa('go', ['build', 'compiler.go'], {
     cwd: path.dirname(goEntryTmpPath),
     env: { GOARCH: goTargetArch, GOOS: goTargetOs },
   });
 
-  console.info(path.dirname(nodePath));
+  const compilerPath = path.join(path.dirname(goEntryTmpPath), 'compiler');
+  await fs.move(compilerPath, path.join(process.cwd(), `${appName}${goTargetOs === 'windows' ? '.exe' : ''}`), {
+    overwrite: true,
+  });
 
   return outFilePath;
 }

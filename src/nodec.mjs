@@ -72,8 +72,6 @@ async function nodec(opts) {
 
     const downloadLocations = await Promise.all(target.map(async osname => downloadNode(nodeVersion, osname)));
 
-    console.info('downloadLocations', downloadLocations);
-
     const bundleLocations = await Promise.all(
       downloadLocations.map(async nodePath => bundleEntrypoint(entry, nodePath, nodeVersion)),
     );
