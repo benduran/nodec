@@ -24,9 +24,8 @@
     "zlib": "^1.0.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.6.5",
-    "@commitlint/config-conventional": "^17.6.5",
-    "@types/conventional-commits-parser": "^3.0.3",
+    "@commitlint/cli": "^19.2.2",
+    "@commitlint/config-conventional": "^19.2.2",
     "@types/fs-extra": "^11.0.4",
     "@types/minimist": "^1.2.5",
     "@types/node": "^20",
