@@ -26,10 +26,17 @@ export async function extractNodeArchive(archivePath) {
     });
   } else await tar.x({ file: archivePath, C: dest });
 
-  const nixMatches = await glob(path.join(dest, '**', 'bin', 'node'), { absolute: true, onlyFiles: true });
-  const winMatches = await glob(path.join(dest, '**', 'node.exe'), { absolute: true, onlyFiles: true });
+  const [nixexe = ''] = await glob(path.join(dest, '**', 'bin', 'node'), { absolute: true, onlyFiles: true });
+  const [winexec = ''] = await glob(path.join(dest, '**', 'node.exe'), { absolute: true, onlyFiles: true });
 
-  const nodePath = nixMatches[0] || winMatches[0];
+  let nodePath = '';
+
+  if (winexec) {
+    // need to drop the .exe from the binary
+    const winMvPath = path.join(path.dirname(winexec), 'node');
+    await fs.move(winexec, winMvPath, { overwrite: true });
+    nodePath = winMvPath;
+  } else nodePath = nixexe;
 
   if (!nodePath) {
     throw new Error(`No node executable was found to extract in the archive rendered in "${archivePath}"`);
