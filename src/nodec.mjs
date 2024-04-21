@@ -3,16 +3,19 @@ import os from 'node:os';
 import fs from 'fs-extra';
 import minimist from 'minimist';
 
+import { bundleEntrypoint } from './bundleEntrypoint.mjs';
+import { compileBinary } from './compileBinary.mjs';
 import { defaultNodeVersion, supportedOs } from './constants.mjs';
 import { downloadNode } from './downloadNode.mjs';
 import { getTempFolder } from './getTempFolder.mjs';
+import { guardGoToolchain } from './guardGoToolchain.mjs';
 
 /**
  * @typedef {Object} NodecOpts
  * @property {string} entry
- * @property {'linux' | 'macos' | 'win'} [os]
  * @property {string} [name]
  * @property {string} [nodeVersion]
+ * @property {boolean} [help]
  */
 
 function printHelp() {
@@ -65,9 +68,19 @@ async function nodec(opts) {
       );
     }
 
+    await guardGoToolchain();
+
     const downloadLocations = await Promise.all(target.map(async osname => downloadNode(nodeVersion, osname)));
 
     console.info('downloadLocations', downloadLocations);
+
+    const bundleLocations = await Promise.all(
+      downloadLocations.map(async nodePath => bundleEntrypoint(entry, nodePath, nodeVersion)),
+    );
+
+    await Promise.all(
+      target.map(async (target, i) => compileBinary(bundleLocations[i], downloadLocations[i], target, name)),
+    );
 
     cleanup();
   } catch (error) {

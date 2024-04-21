@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
 
-import { extractArchive } from './extractArchive.mjs';
+import { extractNodeArchive } from './extractNodeArchive.mjs';
 import { getTempFolder } from './getTempFolder.mjs';
 
 /**
@@ -38,7 +38,7 @@ export async function downloadNode(version, target) {
 
   await fs.writeFile(downloadPath, Buffer.from(await response.arrayBuffer()));
 
-  const nodePath = await extractArchive(downloadPath);
+  const nodePath = await extractNodeArchive(downloadPath);
 
   return nodePath;
 }

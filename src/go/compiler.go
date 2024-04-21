@@ -11,10 +11,10 @@ import (
 	"path"
 )
 
-//go:embed node.gz
+//go:embed node
 var nodeBinaryCompressed []byte
 
-//go:embed bundled.js.gz
+//go:embed bundled.js
 var jsappCompressed []byte
 
 func cleanup(tmpNodePath, tmpJsBundlePath string) error {

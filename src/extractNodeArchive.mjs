@@ -13,7 +13,7 @@ import { getTempFolder } from './getTempFolder.mjs';
  * to the nodec temp folder
  * @param {string} archivePath
  */
-export async function extractArchive(archivePath) {
+export async function extractNodeArchive(archivePath) {
   const dest = path.join(getTempFolder(), path.basename(archivePath).replace(/((\.tar)?(\.(xz|gz))|(\.zip))$/, ''));
   await fs.ensureDir(dest);
 
