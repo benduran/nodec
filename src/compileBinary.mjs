@@ -37,9 +37,13 @@ export async function compileBinary(bundlePath, nodePath, target, appName) {
   });
 
   const compilerPath = path.join(path.dirname(goEntryTmpPath), 'compiler');
-  await fs.move(compilerPath, path.join(process.cwd(), `${appName}${goTargetOs === 'windows' ? '.exe' : ''}`), {
-    overwrite: true,
-  });
+  await fs.move(
+    compilerPath,
+    path.join(process.cwd(), `${appName}-${target}${goTargetOs === 'windows' ? '.exe' : ''}`),
+    {
+      overwrite: true,
+    },
+  );
 
   return outFilePath;
 }
