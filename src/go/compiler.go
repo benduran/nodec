@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path"
+	"runtime"
 	"syscall"
 )
 
@@ -92,7 +93,11 @@ func main() {
 	}
 
 	// Write the embedded Node.js binary to a temporary file
-	tmpNodePath, err := writeTempFile(nodeBinary, "node")
+	filename := "node"
+	if runtime.GOOS == "windows" {
+		filename += ".exe"
+	}
+	tmpNodePath, err := writeTempFile(nodeBinary, filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to write temporary node binary: %v\n", err)
 		os.Exit(1)
