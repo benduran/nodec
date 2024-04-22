@@ -24,3 +24,5 @@ go.work
 compiler
 nodec
 node_modules
+
+.DS_Store
