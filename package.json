@@ -9,6 +9,18 @@
   "engines": {
     "node": ">=18"
   },
+  "keywords": [
+    "binary",
+    "compile",
+    "single-file",
+    "pkg",
+    "compiler",
+    "node compiler",
+    "single file",
+    "standalone",
+    "executable",
+    "exe"
+  ],
   "files": [
     "src/**",
     "README.md",
