@@ -21,10 +21,10 @@ import { guardGoToolchain } from './guardGoToolchain.mjs';
 function printHelp() {
   console.info(`Usage of nodec:
 --entry string
-       (Required): The entrypoint t o your JavaScript or TypeScript application
+       (Required): the entrypoint to your JavaScript or TypeScript application
 --name string
        the final outputted filename that represents your compiled application (default "my-app")
---node-version
+--node-version string
        defines the version of NodeJS that will be used when compiling your standalone executable. Must be an explicit version. Semver ranges are not supported. (default "${defaultNodeVersion}")
 --target
        one or more comma-separated os+arch compilation targets: ${Array.from(supportedOs).join(',')}
