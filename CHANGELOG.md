@@ -1,3 +1,11 @@
+## 0.1.2 (2024-04-22)
+
+### 🛠️ Fixes 🛠️
+
+- fix: removed zlib package that isn't used because node includes its own now (61c89608aa096e7057cd279a61423232622d0206)
+
+---
+
 ## 0.1.1 (2024-04-22)
 
 ### 📖 Docs 📖
