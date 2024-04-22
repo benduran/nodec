@@ -22,9 +22,7 @@
     "exe"
   ],
   "files": [
-    "src/**",
-    "README.md",
-    "LICENSE"
+    "src/**"
   ],
   "scripts": {
     "release": "lets-version apply-bumps --allow-uncommitted"
