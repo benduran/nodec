@@ -1,3 +1,11 @@
+## 0.1.1 (2024-04-22)
+
+### 📖 Docs 📖
+
+- docs: added keywords (b9160259975dc8c6a29fae63c3f1ea80afa93543)
+
+---
+
 ## 0.1.0 (2024-04-22)
 
 ### 🔀 Miscellaneous 🔀
