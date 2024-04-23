@@ -1,3 +1,11 @@
+## 0.1.8 (2024-04-23)
+
+### 🛠️ Fixes 🛠️
+
+- fix: fixed untarring on macos platforms (04d4181871173e4aebb2a491b3347f08042b3d28)
+
+---
+
 ## 0.1.7 (2024-04-23)
 
 ### 🛠️ Fixes 🛠️
