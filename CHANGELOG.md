@@ -1,3 +1,11 @@
+## 0.1.5 (2024-04-23)
+
+### 🛠️ Fixes 🛠️
+
+- fix: added missing node shebang to binfile (388b42c200130bee7dfe3a0c53c5faf58f9634f7)
+
+---
+
 ## 0.1.4 (2024-04-23)
 
 ### 🛠️ Fixes 🛠️
