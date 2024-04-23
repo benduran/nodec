@@ -1,3 +1,11 @@
+## 0.1.4 (2024-04-23)
+
+### 🛠️ Fixes 🛠️
+
+- fix: added cjs support and fixed some compilation paths (f58f149e605afcf49d57464e4573bc8dd1d609f5)
+
+---
+
 ## 0.1.3 (2024-04-22)
 
 ### 🔀 Miscellaneous 🔀
