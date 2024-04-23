@@ -18,8 +18,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {string} nodePath
  * @param {SupportedOS} target
  * @param {string} appName
+ * @param {string} outDir
  */
-export async function compileBinary(bundlePath, nodePath, target, appName) {
+export async function compileBinary(bundlePath, nodePath, target, appName, outDir) {
   console.info('nodePath', nodePath);
   const [os, arch] = target.split('-');
   const outFilePath = path.join(path.dirname(nodePath), `${appName}${os === 'win' ? '.exe' : ''}`);
@@ -40,13 +41,9 @@ export async function compileBinary(bundlePath, nodePath, target, appName) {
   const compilerPath = `${path.join(path.dirname(goEntryTmpPath), 'compiler')}${
     goTargetOs === 'windows' ? '.exe' : ''
   }`;
-  await fs.move(
-    compilerPath,
-    path.join(process.cwd(), `${appName}-${target}${goTargetOs === 'windows' ? '.exe' : ''}`),
-    {
-      overwrite: true,
-    },
-  );
+  await fs.move(compilerPath, path.join(outDir, `${appName}-${target}${goTargetOs === 'windows' ? '.exe' : ''}`), {
+    overwrite: true,
+  });
 
   return outFilePath;
 }

@@ -9,8 +9,9 @@ import { gzipCompress } from './compress.mjs';
  * @param {string} entrypoint
  * @param {string} nodePath
  * @param {string} nodeVersion
+ * @param {'cjs' | 'esm'} format
  */
-export async function bundleEntrypoint(entrypoint, nodePath, nodeVersion) {
+export async function bundleEntrypoint(entrypoint, nodePath, nodeVersion, format) {
   const dest = path.join(path.dirname(nodePath), 'bundled.js');
 
   const entrypointPath = path.resolve(entrypoint);
@@ -18,7 +19,7 @@ export async function bundleEntrypoint(entrypoint, nodePath, nodeVersion) {
   await build({
     bundle: true,
     entryPoints: [entrypointPath],
-    format: 'esm',
+    format,
     outfile: dest,
     platform: 'node',
     target: `node${nodeVersion}`,

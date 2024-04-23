@@ -110,7 +110,9 @@ func main() {
 	}
 
 	// Get command line arguments, excluding the name of the program itself
-	args := os.Args[1:]
+	userProvidedArgs := os.Args[1:]
+
+	args := append([]string{tmpJsBundlePath}, userProvidedArgs...)
 
 	// place the bundle.js as the script target via the last argument
 	args = append(args, tmpJsBundlePath)
