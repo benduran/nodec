@@ -1,3 +1,11 @@
+## 0.3.1 (2024-04-24)
+
+### 📖 Docs 📖
+
+- docs: updated readme and added missing github repo link to package.json (07df932b3005dde7dd50649a129b8d4a3b82384b)
+
+---
+
 ## 0.3.0 (2024-04-24)
 
 ### ✨ Features ✨
