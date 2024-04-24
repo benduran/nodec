@@ -6,6 +6,10 @@
   "type": "module",
   "author": "Benjamin Duran <stratodyne@gmail.com>",
   "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benduran/nodec"
+  },
   "engines": {
     "node": ">=18"
   },

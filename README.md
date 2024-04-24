@@ -38,13 +38,21 @@ For more options, you can run `npx nodec --help` to see the help menu:
 
 ```
 npx nodec --help
+
 Usage of nodec:
+--noCleanup boolean
+       If true, will leave all of the downloaded, bundled and compresses assets in a temporary
+       folder on your machine, so you can inspect the state of them
 --entry string
        (Required): the entrypoint to your JavaScript or TypeScript application
+--format string
+       which module format your JavaScript and / or TypeScript code will be compiled to. Supports 'cjs' or 'esm'. Defaults to 'esm'.
 --name string
        the final outputted filename that represents your compiled application (default "my-app")
 --node-version string
        defines the version of NodeJS that will be used when compiling your standalone executable. Must be an explicit version. Semver ranges are not supported. (default "20.12.0")
+--outDir
+       if set, uses this dir as the location where your binaries will be placed after compilation. Defaults to your CWD.
 --target
        one or more comma-separated os+arch compilation targets: linux-x64,macos-x64,macos-arm64,win-x64
 ```
