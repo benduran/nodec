@@ -28,7 +28,7 @@ func cleanup(tmpNodePath, tmpJsBundlePath string) error {
 }
 
 func writeTempFile(data []byte, filename string) (string, error) {
-	tmpFileDir := path.Join(os.TempDir(), "nodec", "extracted")
+	tmpFileDir := path.Join(os.TempDir(), "nodec", "executing")
 	err := os.MkdirAll(tmpFileDir, 0755)
 
 	if err != nil {

@@ -7,7 +7,7 @@ import lzma from 'lzma-native';
 import path from 'path';
 import * as tar from 'tar';
 
-import { getTempFolder } from './getTempFolder.mjs';
+import { NodecFolders } from './folders.mjs';
 
 /**
  * Generically inflates an archive file
@@ -41,7 +41,10 @@ async function extractArchive(archivePath, dest) {
  * @param {string} archivePath
  */
 export async function extractNodeArchive(archivePath) {
-  const dest = path.join(getTempFolder(), path.basename(archivePath).replace(/((\.tar)?(\.(xz|gz))|(\.zip))$/, ''));
+  const dest = path.join(
+    NodecFolders.extracted,
+    path.basename(archivePath).replace(/((\.tar)?(\.(xz|gz))|(\.zip))$/, ''),
+  );
   await fs.ensureDir(dest);
 
   console.info(`Extracting ${archivePath} to ${dest}`);

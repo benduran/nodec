@@ -9,7 +9,7 @@ import { bundleEntrypoint } from './bundleEntrypoint.mjs';
 import { compileBinary } from './compileBinary.mjs';
 import { defaultNodeVersion, supportedOs } from './constants.mjs';
 import { downloadNode } from './downloadNode.mjs';
-import { getTempFolder } from './getTempFolder.mjs';
+import { NodecFolders } from './folders.mjs';
 import { guardGoToolchain } from './guardGoToolchain.mjs';
 
 /**
@@ -52,10 +52,11 @@ function cleanup(noCleanup) {
   if (noCleanup) {
     return console.info(
       'you opted for --no-cleanup so all artifacts have been left in the following temp folder:',
-      getTempFolder(),
+      NodecFolders.root,
     );
   }
-  fs.removeSync(getTempFolder());
+  const foldersToRemove = [NodecFolders.extracted];
+  for (const folder of foldersToRemove) fs.removeSync(folder);
 }
 
 /**
@@ -104,10 +105,12 @@ async function nodec(opts) {
       downloadLocations.map(async nodePath => bundleEntrypoint(entry, nodePath, nodeVersion, format)),
     );
 
-    await Promise.all(
+    const renderedLocations = await Promise.all(
       target.map(async (target, i) => compileBinary(bundleLocations[i], downloadLocations[i], target, name, outDir)),
     );
 
+    console.info('rendered the following binaries:');
+    console.info(renderedLocations.join(os.EOL));
     cleanup(noCleanup);
   } catch (error) {
     cleanup(noCleanup);

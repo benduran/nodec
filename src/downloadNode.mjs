@@ -1,10 +1,11 @@
+import glob from 'fast-glob';
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
 
 import { gzipCompress } from './compress.mjs';
 import { extractNodeArchive } from './extractNodeArchive.mjs';
-import { getTempFolder } from './getTempFolder.mjs';
+import { NodecFolders } from './folders.mjs';
 
 /**
  * @typedef {import('./constants.mjs').SupportedOSKeys} SupportedOSKeys
@@ -16,7 +17,9 @@ import { getTempFolder } from './getTempFolder.mjs';
  * @param {SupportedOSKeys} target
  */
 export async function downloadNode(version, target) {
-  const tempFolder = getTempFolder();
+  const tempFolder = NodecFolders.downloadCache;
+
+  await fs.ensureDir(tempFolder);
 
   const [providedOs, arch] = target.split('-');
 
@@ -27,17 +30,22 @@ export async function downloadNode(version, target) {
   // windows format: https://nodejs.org/dist/v20.12.0/node-v20.12.0-win-x64.zip
 
   const filename = `node-v${version}-${os}-${arch}.${os === 'win' ? 'zip' : `tar.${os === 'darwin' ? 'xz' : 'gz'}`}`;
-  const url = `https://nodejs.org/dist/v${version}/${filename}`;
 
+  // before attempting to download node, check to see if the requested version already exists in the disk cache
+  const cacheDirResults = await glob(path.join(tempFolder, filename), { absolute: true, onlyFiles: true });
   const downloadPath = path.join(tempFolder, filename);
 
-  console.info(`Downloading node from ${url}`);
-  const response = await fetch(url, { method: 'GET' });
-  if (!response.ok) {
-    throw new Error(`Failed to download ${url}`);
-  }
+  if (cacheDirResults.every(p => p !== downloadPath)) {
+    const url = `https://nodejs.org/dist/v${version}/${filename}`;
 
-  await fs.writeFile(downloadPath, Buffer.from(await response.arrayBuffer()));
+    console.info(`Downloading node from ${url}`);
+    const response = await fetch(url, { method: 'GET' });
+    if (!response.ok) {
+      throw new Error(`Failed to download ${url}`);
+    }
+
+    await fs.writeFile(downloadPath, Buffer.from(await response.arrayBuffer()));
+  } else console.info('Found', filename, 'in the nodec cache. Skipping download!');
 
   const nodePath = await extractNodeArchive(downloadPath);
 

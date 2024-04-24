@@ -1,6 +1,11 @@
 # `@better-builds/nodec`
 The `node compiler (nodec)`, or rather, unofficial node-application-to-standalone-executable compiler, complete with ESBuild bundling support.
 
+**Warning:** This project is *highly experimental* and likely has bugs.
+If you notice anything strange, please report it.
+PRs are also welcome, too!
+Thanks!
+
 ## Prerequisites
 
 * `golang v1.16` or greater (the `go` command must be available in your system `$PATH`)
