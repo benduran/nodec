@@ -1,3 +1,11 @@
+## 0.3.0 (2024-04-24)
+
+### ✨ Features ✨
+
+- feat: added app name in executing path for extracted, compiled binary contents (4e26998535e0cca583214faf9cc518613e2abbc9)
+
+---
+
 ## 0.2.0 (2024-04-23)
 
 ### 🔀 Miscellaneous 🔀
