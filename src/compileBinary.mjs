@@ -27,7 +27,10 @@ export async function compileBinary(bundlePath, nodePath, target, appName, outDi
   const goTargetArch = arch === 'x64' ? 'amd64' : arch;
   const goTargetOs = os === 'macos' ? 'darwin' : os === 'win' ? 'windows' : 'linux';
 
-  const goEntryTemplate = await fs.readFile(path.join(__dirname, 'go', 'compiler.go'), 'utf-8');
+  let goEntryTemplate = await fs.readFile(path.join(__dirname, 'go', 'compiler.go'), 'utf-8');
+
+  // replace the {{appName}} placeholder with the appName the user has chosen
+  goEntryTemplate = goEntryTemplate.replace('{{appName}}', appName);
 
   const goEntryTmpPath = path.join(path.dirname(nodePath), 'compiler.go');
   await fs.writeFile(goEntryTmpPath, goEntryTemplate, 'utf-8');
