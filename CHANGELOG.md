@@ -1,3 +1,23 @@
+## 0.2.0 (2024-04-23)
+
+### 🔀 Miscellaneous 🔀
+
+- Merge pull request #2 from benduran/bduran/node-caching (fc1f3409b8b010d8932fbf4189e6d02ae9d9ea39)
+
+
+
+### 📖 Docs 📖
+
+- docs: updated readme to add a warning (30603be8e6a7ce7a763e346401127ae8e0ae87c6)
+
+
+
+### ✨ Features ✨
+
+- feat: added node download caching to speed up the compilation process (33a0f5deb971d523ebae3532a96800075f117adc)
+
+---
+
 ## 0.1.8 (2024-04-23)
 
 ### 🛠️ Fixes 🛠️
