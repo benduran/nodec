@@ -1,3 +1,11 @@
+## 0.4.0 (2024-04-25)
+
+### ✨ Features ✨
+
+- feat: added minification of JS by default and fixed the order of flags presented in the help menu (a56152e4c26191d00290b2a58181cbf338c4a86d)
+
+---
+
 ## 0.3.2 (2024-04-25)
 
 ### 🔀 Miscellaneous 🔀
