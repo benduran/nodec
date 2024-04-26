@@ -29,9 +29,7 @@ func cleanup(tmpNodePath, tmpJsBundlePath string) error {
 
 func writeTempFile(data []byte, filename string) (string, error) {
 	tmpFileDir := path.Join(os.TempDir(), "nodec", "executing", "{{appName}}")
-	err := os.MkdirAll(tmpFileDir, 0755)
-
-	if err != nil {
+	if err := os.MkdirAll(tmpFileDir, 0755); err != nil {
 		return "", err
 	}
 
@@ -42,18 +40,15 @@ func writeTempFile(data []byte, filename string) (string, error) {
 		return "", err
 	}
 
-	_, err = io.Copy(tmpFile, bytes.NewReader(data))
-	if err != nil {
+	if _, err := io.Copy(tmpFile, bytes.NewReader(data)); err != nil {
 		return "", err
 	}
 
-	err = tmpFile.Close()
-	if err != nil {
+	if err := tmpFile.Close(); err != nil {
 		return "", err
 	}
 
-	err = os.Chmod(tmpFile.Name(), 0755)
-	if err != nil {
+	if err := os.Chmod(tmpFile.Name(), 0755); err != nil {
 		return "", err
 	}
 
