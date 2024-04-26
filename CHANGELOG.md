@@ -1,3 +1,11 @@
+## 0.3.2 (2024-04-25)
+
+### 🔀 Miscellaneous 🔀
+
+- chore: moved err handling to be slightly more idiomatic (cd4e61e72fc49190ce6caf257128140b6be1d967)
+
+---
+
 ## 0.3.1 (2024-04-24)
 
 ### 📖 Docs 📖
