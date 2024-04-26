@@ -20,6 +20,7 @@ export async function bundleEntrypoint(entrypoint, nodePath, nodeVersion, format
     bundle: true,
     entryPoints: [entrypointPath],
     format,
+    minify: true,
     outfile: dest,
     platform: 'node',
     target: `node${nodeVersion}`,
