@@ -1,3 +1,11 @@
+## 0.5.1 (2024-04-27)
+
+### 🛠️ Fixes 🛠️
+
+- fix: wrong binfile (1427f86c6ebbc5b4c5fb6078cb4875afdff1db48)
+
+---
+
 ## 0.5.0 (2024-04-27)
 
 ### 🔀 Miscellaneous 🔀

@@ -1,6 +1,6 @@
 {
   "name": "@better-builds/nodec",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "The unofficial node-application-to-standalone-executable compiler, complete with ESBuild support.",
   "bin": "./dist/nodec.js",
   "files": [
