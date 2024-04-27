@@ -1,3 +1,11 @@
+## 0.5.2 (2024-04-27)
+
+### 🔀 Miscellaneous 🔀
+
+- chore: removed bogus console log (c2238940af63f5465319e1104ee47a25ea167928)
+
+---
+
 ## 0.5.1 (2024-04-27)
 
 ### 🛠️ Fixes 🛠️
