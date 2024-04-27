@@ -104,13 +104,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	// this will be set by the JS build runtime, before Go is used to compile
+	nodeFlags := []string{}
+
 	// Get command line arguments, excluding the name of the program itself
 	userProvidedArgs := os.Args[1:]
 
-	args := append([]string{tmpJsBundlePath}, userProvidedArgs...)
-
-	// place the bundle.js as the script target via the last argument
-	args = append(args, tmpJsBundlePath)
+	args := append(nodeFlags, append([]string{tmpJsBundlePath}, userProvidedArgs...)...)
 
 	// Create a command with the arguments
 	cmd := exec.Command(tmpNodePath, args...)

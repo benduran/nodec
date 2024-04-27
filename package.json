@@ -2,7 +2,10 @@
   "name": "@better-builds/nodec",
   "version": "0.4.0",
   "description": "The unofficial node-application-to-standalone-executable compiler, complete with ESBuild support.",
-  "bin": "./src/nodec.mjs",
+  "bin": "./dist/nodec.mjs",
+  "files": [
+    "dist/**"
+  ],
   "type": "module",
   "author": "Benjamin Duran <stratodyne@gmail.com>",
   "license": "UNLICENSED",
@@ -25,11 +28,16 @@
     "executable",
     "exe"
   ],
-  "files": [
-    "src/**"
-  ],
   "scripts": {
-    "release": "lets-version apply-bumps --allow-uncommitted"
+    "build": "npm run clean && npm run compile && npm run copy",
+    "clean": "rm -rf dist/",
+    "copy": "cp -r src/go dist/go",
+    "debug": "tsx ./src/nodec.ts",
+    "compile": "tsc",
+    "lint": "eslint --no-error-on-unmatched-pattern './src/**/*.{tsx,ts,jsx,js,mjs}'",
+    "lint:fix": "npm run lint -- --fix",
+    "release": "lets-version apply-bumps --allow-uncommitted",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "command-exists": "^1.2.9",
@@ -39,17 +47,21 @@
     "fast-glob": "^3.3.2",
     "fs-extra": "^11.2.0",
     "lzma-native": "^8.0.6",
-    "minimist": "^1.2.8",
     "node-fetch": "^3.3.2",
-    "tar": "^7.0.1"
+    "tar": "^7.0.1",
+    "tsx": "^4.7.3",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@better-builds/lets-version": "^0.8.2",
     "@commitlint/cli": "^19.2.2",
     "@commitlint/config-conventional": "^19.2.2",
+    "@types/command-exists": "^1.2.3",
     "@types/fs-extra": "^11.0.4",
     "@types/minimist": "^1.2.5",
     "@types/node": "^20",
+    "@types/lzma-native": "^4.0.4",
+    "@types/yargs": "^17.0.32",
     "eslint-config-react-yas": "^4.1.0",
     "fastify": "^4.26.2",
     "husky": "^9.0.11",
