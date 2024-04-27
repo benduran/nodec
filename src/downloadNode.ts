@@ -3,20 +3,15 @@ import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
 
-import { gzipCompress } from './compress.mjs';
-import { extractNodeArchive } from './extractNodeArchive.mjs';
-import { NodecFolders } from './folders.mjs';
-
-/**
- * @typedef {import('./constants.mjs').SupportedOSKeys} SupportedOSKeys
- */
+import { gzipCompress } from './compress.js';
+import { extractNodeArchive } from './extractNodeArchive.js';
+import { NodecFolders } from './folders.js';
+import { SupportedOS } from './types.js';
 
 /**
  * Downloads the specific node.js version to disk in a temporary location
- * @param {string} version
- * @param {SupportedOSKeys} target
  */
-export async function downloadNode(version, target) {
+export async function downloadNode(version: string, target: SupportedOS) {
   const tempFolder = NodecFolders.downloadCache;
 
   await fs.ensureDir(tempFolder);

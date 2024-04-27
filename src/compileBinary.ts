@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { execa } from 'execa';
 import fs from 'fs-extra';
 
+import { SupportedOS } from './types.js';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
@@ -13,14 +15,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /**
  * Uses the go toolchain to compile the resulting node + JS bundle into a
  * portable, standalone executable
- *
- * @param {string} bundlePath
- * @param {string} nodePath
- * @param {SupportedOS} target
- * @param {string} appName
- * @param {string} outDir
  */
-export async function compileBinary(bundlePath, nodePath, target, appName, outDir) {
+export async function compileBinary(
+  bundlePath: string,
+  nodePath: string,
+  nodeFlags: string[],
+  target: SupportedOS,
+  appName: string,
+  outDir: string,
+) {
   console.info('nodePath', nodePath);
   const [os, arch] = target.split('-');
 
@@ -31,6 +34,11 @@ export async function compileBinary(bundlePath, nodePath, target, appName, outDi
 
   // replace the {{appName}} placeholder with the appName the user has chosen
   goEntryTemplate = goEntryTemplate.replace('{{appName}}', appName);
+
+  goEntryTemplate = goEntryTemplate.replace(
+    'nodeFlags := []string{}',
+    `nodeFlags := []string{${nodeFlags.map(flag => `"${flag.replace(/^["']/, '').replace(/["']$/, '')}"`)}}`,
+  );
 
   const goEntryTmpPath = path.join(path.dirname(nodePath), 'compiler.go');
   await fs.writeFile(goEntryTmpPath, goEntryTemplate, 'utf-8');

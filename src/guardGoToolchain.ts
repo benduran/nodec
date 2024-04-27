@@ -24,7 +24,7 @@ export async function guardGoToolchain() {
   // if we got here, go is installed, but we need to be on a certain minimum version that supports
   // embedding, wh9ich is go 1.16
   const goVersionResult = execSync('go version', { stdio: 'pipe' }).toString('utf-8').trim();
-  const [, versionMatch = ''] = /go\s+version\sgo((\d+\.?){1,3})/.exec(goVersionResult);
+  const [, versionMatch = ''] = /go\s+version\sgo((\d+\.?){1,3})/.exec(goVersionResult) ?? [];
   const minRequiredVersion = '1.16';
   const sortedSemver = [versionMatch, minRequiredVersion].sort();
 

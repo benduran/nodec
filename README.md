@@ -20,7 +20,7 @@ npm install @better-builds/nodec --save-dev
 ## Usage
 
 ```
-npx nodec --entrypoint ./src/entrypoint.ts --name my-cool-app
+npx nodec --entry ./src/entrypoint.ts --name my-cool-app
 ```
 
 The example, above 👆🏼, will compile your TypeScript file, using the `nodec` default Node.js version (`20.12.0`), and a resulting `my-cool-app` binary file with appear in your `cwd`.
@@ -29,7 +29,7 @@ The resulting binary will match OS + ARCH of the machine where it is run.
 If you want to cross-compile to multiple OS targets, you can provide a comma-separated list of all the targets you desire:
 
 ```
-npx nodec --entrypoint ./src/entrypoint.ts --name my-cool-app --target linux-x64,macos-x64,macos-arm64,win-x64
+npx nodec --entry ./src/entrypoint.ts --name my-cool-app --target linux-x64 --target macos-x64 --target macos-arm64 --target win-x64
 ```
 
 You will then see four (4) different binaries in your `cwd`, each corresponding to the various OS + ARCH targets you've specified.
@@ -39,22 +39,33 @@ For more options, you can run `npx nodec --help` to see the help menu:
 ```
 npx nodec --help
 
-Usage of nodec:
---noCleanup boolean
-       If true, will leave all of the downloaded, bundled and compresses assets in a temporary
-       folder on your machine, so you can inspect the state of them
---entry string
-       (Required): the entrypoint to your JavaScript or TypeScript application
---format string
-       which module format your JavaScript and / or TypeScript code will be compiled to. Supports 'cjs' or 'esm'. Defaults to 'esm'.
---name string
-       the final outputted filename that represents your compiled application (default "my-app")
---node-version string
-       defines the version of NodeJS that will be used when compiling your standalone executable. Must be an explicit version. Semver ranges are not supported. (default "20.12.0")
---outDir
-       if set, uses this dir as the location where your binaries will be placed after compilation. Defaults to your CWD.
---target
-       one or more comma-separated os+arch compilation targets: linux-x64,macos-x64,macos-arm64,win-x64
+Options:
+  --version      Show version number                                   [boolean]
+  --entry        the entrypoint to your JavaScript or TypeScript application
+                                                             [string] [required]
+  --format       which module format your JavaScript and / or TypeScript code wi
+                 ll be compiled to
+                               [string] [choices: "cjs", "esm"] [default: "esm"]
+  --name         the final outputted filename that represents your compiled appl
+                 ication                            [string] [default: "my-app"]
+  --noCleanup    if true, will leave all of the downloaded, bundled and compress
+                 es assets in a temporary folder on your machine, so you can ins
+                 pect the state of them               [boolean] [default: false]
+  --nodeFlags    one or more node.js flags to automatically set when executing y
+                 our compiled application (like --experimental-require-module, -
+                 -experimental-default-type and others). for a list of available
+                  flags, please refer to the official node.js documentation: htt
+                 ps://nodejs.org/docs/latest/api           [array] [default: []]
+  --nodeVersion  defines the version of NodeJS that will be used when compiling
+                 your standalone executable. Must be an explicit version. Semver
+                  ranges are not supported.        [string] [default: "20.12.0"]
+  --outDir       if set, uses this dir as the location where your binaries will
+                 be placed after compilation. Defaults to your CWD.
+                  [string] [default: "/home/stratodyne/devlop/opensource/nodec"]
+  --target       one or more os+arch compilation targets
+  [array] [choices: "linux-x64", "macos-x64", "macos-arm64", "win-x64"] [default
+                                                                : ["linux-x64"]]
+  --help         Show help                                             [boolean]
 ```
 
 ---

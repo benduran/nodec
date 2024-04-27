@@ -7,15 +7,12 @@ import lzma from 'lzma-native';
 import path from 'path';
 import * as tar from 'tar';
 
-import { NodecFolders } from './folders.mjs';
+import { NodecFolders } from './folders.js';
 
 /**
  * Generically inflates an archive file
- * @param {string} archivePath
- * @param {string} dest
- * @returns {Promise<void>}
  */
-async function extractArchive(archivePath, dest) {
+async function extractArchive(archivePath: string, dest: string): Promise<void> {
   if (archivePath.endsWith('.zip')) return extractZip(archivePath, { dir: dest });
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(archivePath);
@@ -23,12 +20,16 @@ async function extractArchive(archivePath, dest) {
     if (archivePath.endsWith('.xz')) {
       readStream
         .pipe(lzma.createDecompressor())
+        // these ignore statements were already proven to work,
+        // so we're going to ignore them
+        // @ts-ignore
         .pipe(tar.extract({ C: dest }))
         .once('error', reject)
         .once('finish', resolve);
     } else
       readStream
         .pipe(zlib.createGunzip())
+        // @ts-ignore
         .pipe(tar.extract({ C: dest }))
         .once('error', reject)
         .once('finish', resolve);
@@ -38,9 +39,8 @@ async function extractArchive(archivePath, dest) {
 /**
  * Given a path to a downloaded archive, extracts all of the contents
  * to the nodec temp folder
- * @param {string} archivePath
  */
-export async function extractNodeArchive(archivePath) {
+export async function extractNodeArchive(archivePath: string) {
   const dest = path.join(
     NodecFolders.extracted,
     path.basename(archivePath).replace(/((\.tar)?(\.(xz|gz))|(\.zip))$/, ''),

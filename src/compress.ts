@@ -5,11 +5,8 @@ import fs from 'fs-extra';
 /**
  * Compresses a file using gzip compression.
  * Writes the output to the same path as the input file, but with a .gz suffix
- * @param {string} input - Input file to compress, using gzip
- *
- * @returns {Promise<string>} Path to compressed archive
  */
-export function gzipCompress(input) {
+export function gzipCompress(input: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(input);
 
