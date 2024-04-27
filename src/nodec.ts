@@ -104,8 +104,6 @@ async function nodec() {
     })
     .help().argv;
 
-  console.info('nodeFlags', nodeFlags, 'noCleanup', noCleanup);
-
   try {
     if (!target.every(t => supportedOs.has(t as SupportedOS))) {
       throw new Error(
