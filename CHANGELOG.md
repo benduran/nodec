@@ -1,3 +1,18 @@
+## 0.5.0 (2024-04-27)
+
+### 🔀 Miscellaneous 🔀
+
+- Merge pull request #3 from benduran/bduran/flags-and-typescript (f8f4d87f1b3b9101a9ac0d3a711b59b3ad7a2631)
+- chore: oops, left the poop file in (9d7f5a72be46115f836ade33d68ae591df87bb59)
+
+
+
+### ✨ Features ✨
+
+- feat: added support for setting node flags and switched js toolchain to typescript (5676669750d116a0765c3b89a83392f6175b6a04)
+
+---
+
 ## 0.4.0 (2024-04-25)
 
 ### ✨ Features ✨
