@@ -36,7 +36,7 @@
     "compile": "tsc",
     "lint": "eslint --no-error-on-unmatched-pattern './src/**/*.{tsx,ts,jsx,js,mjs}'",
     "lint:fix": "npm run lint -- --fix",
-    "release": "lets-version apply-bumps --allow-uncommitted",
+    "release": "npx lets-version apply-bumps --allow-uncommitted && npm run build && npm publish",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
