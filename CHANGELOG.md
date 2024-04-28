@@ -1,3 +1,17 @@
+## 0.5.3 (2024-04-28)
+
+### 🔀 Miscellaneous 🔀
+
+- chore: updated conveinece release script (f5ed9e05e46d4fe6591b8fb75291286577ad5981)
+
+
+
+### 📖 Docs 📖
+
+- docs: corrected misinformation in the readme regarding the target flag (936b500495fd59914ddd56385137fe41a34fd0f8)
+
+---
+
 ## 0.5.2 (2024-04-27)
 
 ### 🔀 Miscellaneous 🔀
