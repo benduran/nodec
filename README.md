@@ -26,7 +26,7 @@ npx nodec --entry ./src/entrypoint.ts --name my-cool-app
 The example, above 👆🏼, will compile your TypeScript file, using the `nodec` default Node.js version (`20.12.0`), and a resulting `my-cool-app` binary file with appear in your `cwd`.
 The resulting binary will match OS + ARCH of the machine where it is run.
 
-If you want to cross-compile to multiple OS targets, you can provide a comma-separated list of all the targets you desire:
+If you want to cross-compile to multiple OS targets, you can provide multiple `--target` values for all the targets you desire:
 
 ```
 npx nodec --entry ./src/entrypoint.ts --name my-cool-app --target linux-x64 --target macos-x64 --target macos-arm64 --target win-x64
