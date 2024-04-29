@@ -1,3 +1,11 @@
+## 0.5.4 (2024-04-29)
+
+### 🔀 Miscellaneous 🔀
+
+- chore: simplified the gzip reader (2f3496295838069fcfb1d64c6a67ace32bdd26ae)
+
+---
+
 ## 0.5.3 (2024-04-28)
 
 ### 🔀 Miscellaneous 🔀
