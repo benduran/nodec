@@ -27,7 +27,7 @@ func cleanup(tmpNodePath, tmpJsBundlePath string) error {
 	return os.Remove(tmpJsBundlePath)
 }
 
-func writeTempFile(data []byte, filename string) (string, error) {
+func writeTempFile(reader *gzip.Reader, filename string) (string, error) {
 	tmpFileDir := path.Join(os.TempDir(), "nodec", "executing", "{{appName}}")
 	if err := os.MkdirAll(tmpFileDir, 0755); err != nil {
 		return "", err
@@ -40,7 +40,7 @@ func writeTempFile(data []byte, filename string) (string, error) {
 		return "", err
 	}
 
-	if _, err := io.Copy(tmpFile, bytes.NewReader(data)); err != nil {
+	if _, err := io.Copy(tmpFile, reader); err != nil {
 		return "", err
 	}
 
@@ -55,19 +55,13 @@ func writeTempFile(data []byte, filename string) (string, error) {
 	return tmpFile.Name(), nil
 }
 
-func decompressGzip(data []byte) ([]byte, error) {
+func decompressGzip(data []byte) (*gzip.Reader, error) {
 	reader, err := gzip.NewReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
-	defer reader.Close()
 
-	buf := new(bytes.Buffer)
-	if _, err := io.Copy(buf, reader); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return reader, nil
 }
 
 func main() {
