@@ -1,3 +1,7 @@
+# This project is deprecated and unsupported as of 2nd June, 2025
+
+---
+
 # `@better-builds/nodec`
 The `node compiler (nodec)`, or rather, unofficial node-application-to-standalone-executable compiler, complete with ESBuild bundling support.
 
