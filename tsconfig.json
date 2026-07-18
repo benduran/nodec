@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "incremental": false,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "esnext"
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "extends": "@cprussin/tsconfig/base.json",
+  "include": [
+    "src/"
+  ]
+}

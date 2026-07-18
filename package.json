@@ -1,0 +1,72 @@
+{
+  "author": "Benjamin Duran <stratodyne@gmail.com>",
+  "bin": "./dist/nodec.js",
+  "dependencies": {
+    "command-exists": "^1.2.9",
+    "esbuild": "^0.28.1",
+    "execa": "^9.6.1",
+    "fast-glob": "^3.3.3",
+    "fs-extra": "^11.3.6",
+    "node-fetch": "^3.3.2",
+    "node-stream-zip": "^1.15.0",
+    "tar": "7.5.19",
+    "yargs": "^18.0.0"
+  },
+  "description": "The unofficial node-application-to-standalone-executable compiler, complete with ESBuild support.",
+  "devDependencies": {
+    "@better-builds/lets-version": "^1.6.1",
+    "@biomejs/biome": "^2.5.3",
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
+    "@cprussin/tsconfig": "^5.0.0",
+    "@types/command-exists": "^1.2.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^26",
+    "@types/yargs": "^17.0.35",
+    "fastify": "^5.10.0",
+    "husky": "^9.1.7",
+    "random-words": "^2.0.1",
+    "tsx": "4.23.0",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "keywords": [
+    "binary",
+    "compile",
+    "single-file",
+    "pkg",
+    "compiler",
+    "node compiler",
+    "single file",
+    "standalone",
+    "executable",
+    "exe"
+  ],
+  "license": "UNLICENSED",
+  "name": "@better-builds/nodec",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benduran/nodec"
+  },
+  "scripts": {
+    "build": "pnpm run clean && pnpm run compile && pnpm run copy",
+    "clean": "rm -rf dist/",
+    "compile": "tsc -p tsconfig.build.json",
+    "copy": "cp -r src/go dist/go",
+    "debug": "tsx ./src/nodec.ts",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "release": "lets-version apply-bumps --allow-uncommitted && npm run build && npm publish",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "test:smoke": "tsx --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "version": "1.1.3"
+}

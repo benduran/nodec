@@ -1,0 +1,9 @@
+minimumReleaseAge: 7200
+
+overrides:
+  argue-cli: 3.0.0
+  conventional-commits-parser: 7.0.1
+  fast-json-stringify: 7.0.0
+
+allowBuilds:
+  esbuild: true
