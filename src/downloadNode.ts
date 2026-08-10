@@ -34,14 +34,16 @@ export function findChecksum(
 }
 
 /**
- * Fetches the official SHASUMS256.txt for a Node.js release and returns the
- * expected SHA-256 digest for the requested archive filename.
+ * Fetches the SHASUMS256.txt for a Node.js release (from the official site or
+ * the unofficial musl builds site) and returns the expected SHA-256 digest for
+ * the requested archive filename.
  */
 async function getExpectedChecksum(
   version: string,
   filename: string,
+  baseUrl: string,
 ): Promise<string> {
-  const url = `https://nodejs.org/dist/v${version}/SHASUMS256.txt`;
+  const url = `${baseUrl}${version}/SHASUMS256.txt`;
   const response = await fetch(url, { method: 'GET' });
   if (!response.ok) {
     throw new Error(
@@ -68,11 +70,28 @@ export async function downloadNode(version: string, target: SupportedOS) {
 
   const os = providedOs === 'macos' ? 'darwin' : providedOs;
 
-  const filename = `node-v${version}-${os}-${arch}.${os === 'win' ? 'zip' : 'tar.gz'}`;
+  const isLinux = providedOs === 'linux';
+
+  // Linux targets use statically-linked musl builds from
+  // unofficial-builds.nodejs.org so the final binary has zero
+  // glibc / shared-library dependencies. macOS and Windows targets
+  // use the official nodejs.org binaries (unchanged), which are already fully
+  // staticly-linked
+  const baseUrl = isLinux
+    ? 'https://unofficial-builds.nodejs.org/download/release/v'
+    : 'https://nodejs.org/dist/v';
+
+  const extra = isLinux ? '-musl' : '';
+
+  const filename = `node-v${version}-${os}-${arch}${extra}.${os === 'win' ? 'zip' : 'tar.gz'}`;
 
   const downloadPath = path.join(tempFolder, filename);
 
-  const expectedChecksum = await getExpectedChecksum(version, filename);
+  const expectedChecksum = await getExpectedChecksum(
+    version,
+    filename,
+    baseUrl,
+  );
 
   let useCache = false;
   if (await fs.pathExists(downloadPath)) {
@@ -89,7 +108,7 @@ export async function downloadNode(version: string, target: SupportedOS) {
   if (useCache) {
     console.info('Found', filename, 'in the nodec cache. Skipping download!');
   } else {
-    const url = `https://nodejs.org/dist/v${version}/${filename}`;
+    const url = `${baseUrl}${version}/${filename}`;
 
     console.info(`Downloading node from ${url}`);
     const response = await fetch(url, { method: 'GET' });

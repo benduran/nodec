@@ -156,10 +156,17 @@ Here are some alternate libraries you might be interested in instead, which have
 * [deno standalone executables](https://docs.deno.com/runtime/manual/tools/compiler)
 * [bun single-file executable](https://bun.sh/docs/bundler/executables)
 
+### Platform portability
+
+All targets produce fully self-contained, statically-linked binaries with zero runtime dependencies, with no shared libraries, no `node`, no `npm` and no other toolchain  or system dependencies required. The end user just downloads and runs the binary.
+
+- **macOS** and **Windows** use the official Node.js binaries from [nodejs.org](https://nodejs.org), which are already statically linked for those platforms.
+- **Linux** uses [musl](https://musl.libc.org)-linked Node.js builds from [unofficial-builds.nodejs.org](https://unofficial-builds.nodejs.org). These are fully static binaries that run on any Linux distribution (Debian, Ubuntu, Fedora, Arch, Alpine, and others), but without requiring `libatomic`, `libstdc++`, or any other shared libraries to be present.
+
 ### How `nodec` works
 
 **NodeC** is a *slightly different* take on the Node.js single file executable compilation story.
-It downloads an official Node.js build for your target OS and architecture combinations, compiles your JavaScript or TypeScript entry point with [ESBuild](https://esbuild.github.io/) to a valid ESM JS target that matches your expected Node.js target version, then uses the [Golang](https://go.dev/doc/install) compiler to embed Node and your bundled JavaScript into a cross-compiled binary application.
+It downloads a Node.js binary for your target OS and architecture combinations (official builds for macOS/Windows, musl builds for Linux), compiles your JavaScript or TypeScript entry point with [ESBuild](https://esbuild.github.io/) to a valid ESM JS target that matches your expected Node.js target version, then uses the [Golang](https://go.dev/doc/install) compiler to embed Node and your bundled JavaScript into a cross-compiled binary application.
 
 The resulting compiled binary then inflates your JavaScript bundle and your chosen Node.js target at runtime and executes them, piping all `stdio` to your user, then self-destructing the inflated files after exit.
 
