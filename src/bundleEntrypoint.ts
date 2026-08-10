@@ -5,7 +5,7 @@ import { gzipCompress } from './compress.js';
 import { TargetFormat } from './types.js';
 
 /**
- * ESM is a royal pain. why this module format cannot die yet is beyond me.
+ * CJS is a royal pain. why this module format cannot die yet is beyond me.
  */
 const cjsShimBanner = `import { createRequire as __nodecCreateRequire } from 'node:module';
 import { fileURLToPath as __nodecFileURLToPath } from 'node:url';
