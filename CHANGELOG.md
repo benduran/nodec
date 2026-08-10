@@ -1,3 +1,20 @@
+## 1.2.0 (2026-08-10)
+
+### ✨ Features ✨
+
+- feat: use musl builds of node so the binaries compiled from here (670746c8850f537ca6b00fd7c0a087672ffc5496)
+- feat: initial commit with all prior code and features, yay. fresh repo (0775dce749ee1f868a5bbed9a542501c89990cd0)
+
+
+
+### 🔀 Miscellaneous 🔀
+
+- chore: updated comment to be accurate (ef5cbd8f86f7ba05c2d245f9561493c8bedf01ec)
+- chore: linting (485922cbb07e706fd7a7f031ed95cf87a19b2bee)
+- Initial commit (b8f318084c2857c54f45f103d821d1975d988b25)
+
+---
+
 ## 1.1.3 (2026-07-14)
 
 ### 🔀 Miscellaneous 🔀
