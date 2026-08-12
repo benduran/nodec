@@ -1,3 +1,11 @@
+## 2.0.0 (2026-08-12)
+
+### 🔀 Miscellaneous 🔀
+
+- Version bumped exactly to 2.0.0
+
+---
+
 ## 1.2.1-beta.0 (2026-08-12)
 
 ### 🛠️ Fixes 🛠️
