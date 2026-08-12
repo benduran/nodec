@@ -8,7 +8,7 @@ import { renderGoTemplate } from './compileBinary.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const template =
-  'dir := "nodec-{{appName}}-"\nnode := "{{nodeChecksum}}"\nbundle := "{{bundleChecksum}}"\nnodeFlags := []string{}\n';
+  'dir := "nodec-{{appName}}-"\nnode := "{{nodeChecksum}}"\nbundle := "{{bundleChecksum}}"\nlibs := "{{libsChecksum}}"\nnodeFlags := []string{}\n';
 
 test('renderGoTemplate substitutes both placeholders', () => {
   const out = renderGoTemplate(template, 'my-app', []);
@@ -38,9 +38,11 @@ test('renderGoTemplate falls back to "app" for an empty appName', () => {
 test('renderGoTemplate embeds the integrity checksums', () => {
   const node = 'a'.repeat(64);
   const bundle = 'b'.repeat(64);
-  const out = renderGoTemplate(template, 'my-app', [], { bundle, node });
+  const libs = 'c'.repeat(64);
+  const out = renderGoTemplate(template, 'my-app', [], { bundle, libs, node });
   assert.match(out, new RegExp(`node := "${node}"`));
   assert.match(out, new RegExp(`bundle := "${bundle}"`));
+  assert.match(out, new RegExp(`libs := "${libs}"`));
 });
 
 test('renderGoTemplate leaves no placeholders in the real Go template', async () => {
@@ -50,10 +52,12 @@ test('renderGoTemplate leaves no placeholders in the real Go template', async ()
   );
   const out = renderGoTemplate(real, 'my-app', ['--x'], {
     bundle: 'b'.repeat(64),
+    libs: 'c'.repeat(64),
     node: 'a'.repeat(64),
   });
   assert.doesNotMatch(out, /\{\{appName\}\}/);
   assert.doesNotMatch(out, /\{\{nodeChecksum\}\}/);
   assert.doesNotMatch(out, /\{\{bundleChecksum\}\}/);
+  assert.doesNotMatch(out, /\{\{libsChecksum\}\}/);
   assert.match(out, /nodeFlags := \[\]string\{"--x"\}/);
 });

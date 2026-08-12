@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { gzipSync } from 'node:zlib';
+import { gunzipSync, gzipSync } from 'node:zlib';
 
 import commandExists from 'command-exists';
 
@@ -178,6 +179,9 @@ test('refuses to execute when an embedded integrity checksum does not match', {
     path.join(dir, 'bundled.js.gz'),
     gzipSync(Buffer.from("console.log('x')")),
   );
+  // the go template embeds the runtime libraries too, so the build needs one
+  // present; two 512-byte zero blocks is a valid, empty tar
+  await writeFile(path.join(dir, 'libs.tar.gz'), gzipSync(Buffer.alloc(1024)));
 
   const template = await readFile(
     path.join(repoRoot, 'src', 'go', 'compiler.go'),
@@ -186,6 +190,7 @@ test('refuses to execute when an embedded integrity checksum does not match', {
   // deliberately wrong expected digests -> the runtime must reject before exec
   const src = renderGoTemplate(template, 'tamper', [], {
     bundle: '0'.repeat(64),
+    libs: '0'.repeat(64),
     node: '0'.repeat(64),
   });
   await writeFile(path.join(dir, 'compiler.go'), src);
@@ -197,6 +202,53 @@ test('refuses to execute when an embedded integrity checksum does not match', {
     (err: NodeJS.ErrnoException & { code?: number; stderr?: string }) => {
       assert.equal(err.code, 1);
       assert.match(String(err.stderr), /integrity check/);
+      return true;
+    },
+  );
+});
+
+test('refuses to execute when the bundled runtime libraries are tampered with', {
+  skip: hasGo ? false : 'go toolchain not available',
+  timeout: 120_000,
+}, async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'nodec-tamper-libs-'));
+  after(() => rm(dir, { force: true, recursive: true }));
+
+  const nodeGz = gzipSync(Buffer.from('pretend node binary'));
+  const bundleGz = gzipSync(Buffer.from("console.log('x')"));
+  const libsGz = gzipSync(Buffer.alloc(1024));
+
+  await writeFile(path.join(dir, 'node.gz'), nodeGz);
+  await writeFile(path.join(dir, 'bundled.js.gz'), bundleGz);
+  await writeFile(path.join(dir, 'libs.tar.gz'), libsGz);
+
+  const sha = (data: Buffer) =>
+    createHash('sha256').update(gunzipSync(data)).digest('hex');
+
+  const template = await readFile(
+    path.join(repoRoot, 'src', 'go', 'compiler.go'),
+    'utf-8',
+  );
+  // node and bundle digests are correct here, so the run gets far enough to
+  // reach the library check -- these land on the loader's search path, so a
+  // swapped .so is as dangerous as a swapped node binary.
+  const src = renderGoTemplate(template, 'tamper-libs', [], {
+    bundle: sha(bundleGz),
+    libs: '0'.repeat(64),
+    node: sha(nodeGz),
+  });
+  await writeFile(path.join(dir, 'compiler.go'), src);
+
+  await execFileAsync('go', ['build', 'compiler.go'], { cwd: dir });
+
+  await assert.rejects(
+    () => execFileAsync(path.join(dir, 'compiler')),
+    (err: NodeJS.ErrnoException & { code?: number; stderr?: string }) => {
+      assert.equal(err.code, 1);
+      assert.match(
+        String(err.stderr),
+        /runtime libraries failed their integrity check/,
+      );
       return true;
     },
   );

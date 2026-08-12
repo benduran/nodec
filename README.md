@@ -34,6 +34,14 @@ npx nodec --entry ./src/entrypoint.ts --name my-cool-app --target linux-x64 --ta
 
 You will then see five different binaries in your `cwd`, each corresponding to the various OS and architecture targets you have specified.
 
+To target Alpine (or any other musl-based system), use the `-musl` targets. These are separate from the glibc ones because no prebuilt Node.js binary is statically linked, so a glibc build cannot run on Alpine and a musl build cannot run on Debian or Ubuntu:
+
+```
+npx nodec --entry ./src/entrypoint.ts --name my-cool-app --target linux-x64-musl --target linux-arm64-musl
+```
+
+If you don't know what this means, you probably don't need to worry or care about it 🙂
+
 ### Output format
 
 By default, `nodec` compiles your code to ESM.
@@ -91,7 +99,8 @@ Options:
                  be placed after compilation. Defaults to your CWD.
                 [string] [default: "/Users/benjaminduran/dddddd/personal/nodec"]
   --target       one or more os+arch compilation targets
-       [array] [choices: "linux-x64", "linux-arm64", "macos-x64", "macos-arm64",
+        [array] [choices: "linux-x64", "linux-arm64", "linux-x64-musl",
+              "linux-arm64-musl", "macos-x64", "macos-arm64",
                                            "win-x64"] [default: ["macos-arm64"]]
   --help         Show help                                             [boolean]
 ```
@@ -158,17 +167,22 @@ Here are some alternate libraries you might be interested in instead, which have
 
 ### Platform portability
 
-All targets produce fully self-contained, statically-linked binaries with zero runtime dependencies, with no shared libraries, no `node`, no `npm` and no other toolchain  or system dependencies required. The end user just downloads and runs the binary.
+All targets produce self-contained binaries that need no `node`, no `npm`, no toolchain and no packages installed on the end user's machine. They download the binary and run it.
 
-- **macOS** and **Windows** use the official Node.js binaries from [nodejs.org](https://nodejs.org), which are already statically linked for those platforms.
-- **Linux** uses [musl](https://musl.libc.org)-linked Node.js builds from [unofficial-builds.nodejs.org](https://unofficial-builds.nodejs.org). These are fully static binaries that run on any Linux distribution (Debian, Ubuntu, Fedora, Arch, Alpine, and others), but without requiring `libatomic`, `libstdc++`, or any other shared libraries to be present.
+- **macOS** and **Windows** use the official Node.js binaries from [nodejs.org](https://nodejs.org). Every library those import (`libSystem`, `CoreFoundation`, `KERNEL32`, ...) ships with the OS, so there is nothing to bundle.
+- **Linux** also uses the official builds, plus the handful of shared libraries Node links against that minimal images tend not to ship. `nodec` downloads `libatomic.so.1`, `libstdc++.so.6` and `libgcc_s.so.1`, embeds them next to the runtime, and points `LD_LIBRARY_PATH` at them before starting Node. This is what stops `error while loading shared libraries: libatomic.so.1` on images like `debian:bookworm-slim` (Node v25+ links `libatomic`, which those images do not include).
+- **Alpine** and other musl systems use the `linux-x64-musl` / `linux-arm64-musl` targets, which pull [musl](https://musl.libc.org)-linked builds from [unofficial-builds.nodejs.org](https://unofficial-builds.nodejs.org) and bundle `libgcc_s.so.1` and `libstdc++.so.6` from Alpine. Stock `alpine` images ship neither, so this matters there too.
+
+The bundled libraries are deliberately taken from Debian 10 and require nothing newer than `GLIBC_2.18`, so they never raise the dep floor above Node's own requirement of **glibc 2.28** (Debian 10+, Ubuntu 18.10+, RHEL/Rocky 8+). Verified on `debian:bookworm-slim`, `debian:bullseye-slim`, `ubuntu:20.04`, `rockylinux:8`, `fedora:41` and stock `alpine`, on both x64 and arm64.
 
 ### How `nodec` works
 
 **NodeC** is a *slightly different* take on the Node.js single file executable compilation story.
-It downloads a Node.js binary for your target OS and architecture combinations (official builds for macOS/Windows, musl builds for Linux), compiles your JavaScript or TypeScript entry point with [ESBuild](https://esbuild.github.io/) to a valid ESM JS target that matches your expected Node.js target version, then uses the [Golang](https://go.dev/doc/install) compiler to embed Node and your bundled JavaScript into a cross-compiled binary application.
+It downloads a Node.js binary for your target OS and architecture combinations (official builds from nodejs.org, or musl builds from unofficial-builds for the `-musl` targets), compiles your JavaScript or TypeScript entry point with [ESBuild](https://esbuild.github.io/) to a valid ESM JS target that matches your expected Node.js target version, then uses the [Golang](https://go.dev/doc/install) compiler to embed Node, your bundled JavaScript, and (on Linux) the shared libraries Node needs into a cross-compiled binary application.
 
-The resulting compiled binary then inflates your JavaScript bundle and your chosen Node.js target at runtime and executes them, piping all `stdio` to your user, then self-destructing the inflated files after exit.
+The resulting compiled binary then inflates your JavaScript bundle and your chosen Node.js target at runtime and executes them, piping all `stdio` to your user, then self-destructing the inflated files after exit. Everything embedded is verified against a SHA-256 digest recorded at compile time before it is allowed to run.
+
+Every download `nodec` makes is checksum-verified, with Node.js against the official `SHASUMS256.txt`, and the runtime libraries against digests pinned in `src/runtimeLibs.ts`. Package archives are unwrapped in pure JavaScript (`ar` + `xz` + `tar`), so building a Linux binary from macOS or Windows never shells out to `dpkg`, `ar` or `xz`.
 
 ---
 

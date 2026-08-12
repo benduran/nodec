@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 import { gzipCompress } from './compress.js';
 import { extractNodeArchive } from './extractNodeArchive.js';
 import { NodecFolders } from './folders.js';
+import { parseTarget } from './target.js';
 import type { SupportedOS } from './types.js';
 
 /**
@@ -52,7 +53,17 @@ async function getExpectedChecksum(
   }
 
   const checksum = findChecksum(await response.text(), filename);
-  if (!checksum) throw new Error(`No checksum found for ${filename} in ${url}`);
+  if (!checksum) {
+    // The musl flavours come from unofficial-builds, which does not publish
+    // every arch for every release. this means it's highly likely to encounter
+    // a missing entry.
+    throw new Error(
+      `No checksum found for ${filename} in ${url}. That build is not published for node v${version}` +
+        (filename.includes('-musl')
+          ? '. Not every release publishes a musl build for every architecture -- pick a glibc target, or a node version that has one.'
+          : '.'),
+    );
+  }
 
   return checksum;
 }
@@ -66,24 +77,17 @@ export async function downloadNode(version: string, target: SupportedOS) {
 
   await fs.ensureDir(tempFolder);
 
-  const [providedOs, arch] = target.split('-');
+  const { libc, nodeArch, nodeOs } = parseTarget(target);
 
-  const os = providedOs === 'macos' ? 'darwin' : providedOs;
+  const isMusl = libc === 'musl';
 
-  const isLinux = providedOs === 'linux';
-
-  // Linux targets use statically-linked musl builds from
-  // unofficial-builds.nodejs.org so the final binary has zero
-  // glibc / shared-library dependencies. macOS and Windows targets
-  // use the official nodejs.org binaries (unchanged), which are already fully
-  // staticly-linked
-  const baseUrl = isLinux
+  const baseUrl = isMusl
     ? 'https://unofficial-builds.nodejs.org/download/release/v'
     : 'https://nodejs.org/dist/v';
 
-  const extra = isLinux ? '-musl' : '';
-
-  const filename = `node-v${version}-${os}-${arch}${extra}.${os === 'win' ? 'zip' : 'tar.gz'}`;
+  const filename = `node-v${version}-${nodeOs}-${nodeArch}${
+    isMusl ? '-musl' : ''
+  }.${nodeOs === 'win' ? 'zip' : 'tar.gz'}`;
 
   const downloadPath = path.join(tempFolder, filename);
 

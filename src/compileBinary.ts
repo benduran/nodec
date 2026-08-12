@@ -7,6 +7,8 @@ import { execa } from 'execa';
 import fs from 'fs-extra';
 
 import { machoHasCodeSignature } from './macho.js';
+import { bundleRuntimeLibs } from './runtimeLibs.js';
+import { parseTarget } from './target.js';
 import type { SupportedOS } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 type EmbeddedChecksums = {
   node: string;
   bundle: string;
+  libs: string;
 };
 
 /**
@@ -28,7 +31,7 @@ export function renderGoTemplate(
   template: string,
   appName: string,
   nodeFlags: string[],
-  checksums: EmbeddedChecksums = { bundle: '', node: '' },
+  checksums: EmbeddedChecksums = { bundle: '', libs: '', node: '' },
 ): string {
   const safeAppName = appName.replace(/[^a-zA-Z0-9._-]/g, '_') || 'app';
 
@@ -36,6 +39,7 @@ export function renderGoTemplate(
     .replace('{{appName}}', safeAppName)
     .replace('{{nodeChecksum}}', checksums.node)
     .replace('{{bundleChecksum}}', checksums.bundle)
+    .replace('{{libsChecksum}}', checksums.libs)
     .replace(
       'nodeFlags := []string{}',
       `nodeFlags := []string{${nodeFlags.map(flag => JSON.stringify(String(flag))).join(', ')}}`,
@@ -54,28 +58,6 @@ async function sha256OfInflated(gzPath: string): Promise<string> {
   return hash.digest('hex');
 }
 
-function computeGoTargetOs(os: string | undefined) {
-  const trimmedOs = (os?.trim() || '').toLowerCase();
-  switch (trimmedOs) {
-    case 'macos':
-      return 'darwin';
-    case 'win':
-      return 'windows';
-    default:
-      return 'linux';
-  }
-}
-
-function computeGoTargetArch(arch: string | undefined) {
-  const trimmedArch = (arch?.trim() || '').toLowerCase();
-  switch (trimmedArch) {
-    case 'x64':
-      return 'amd64';
-    default:
-      return trimmedArch;
-  }
-}
-
 /**
  * Uses the go toolchain to compile the resulting node + JS bundle into a
  * portable, standalone executable
@@ -89,17 +71,18 @@ export async function compileBinary(
   outDir: string,
 ) {
   console.info('nodePath', nodePath);
-  const [os, arch] = target.split('-');
-
-  const goTargetArch = computeGoTargetArch(arch);
-  const goTargetOs = computeGoTargetOs(os);
+  const { goArch: goTargetArch, goOs: goTargetOs } = parseTarget(target);
 
   const template = await fs.readFile(
     path.join(__dirname, 'go', 'compiler.go'),
     'utf-8',
   );
+
+  const libsPath = await bundleRuntimeLibs(target, path.dirname(nodePath));
+
   const checksums = {
     bundle: await sha256OfInflated(bundlePath),
+    libs: await sha256OfInflated(libsPath),
     node: await sha256OfInflated(nodePath),
   };
   const goEntryTemplate = renderGoTemplate(

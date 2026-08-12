@@ -7,6 +7,7 @@ const manifest = [
   'aaaa1111  node-v26.5.0-linux-x64.tar.gz',
   'bbbb2222  node-v26.5.0-linux-arm64.tar.gz',
   'cccc3333  node-v26.5.0-win-x64.zip',
+  'dddd4444  node-v26.5.0-linux-x64-musl.tar.gz',
   '',
 ].join('\n');
 
@@ -26,4 +27,15 @@ test('findChecksum returns undefined for a missing filename', () => {
 
 test('findChecksum does not partial-match filenames', () => {
   assert.equal(findChecksum(manifest, 'linux-x64.tar.gz'), undefined);
+});
+
+test('findChecksum distinguishes a musl build from its glibc sibling', () => {
+  assert.equal(
+    findChecksum(manifest, 'node-v26.5.0-linux-x64-musl.tar.gz'),
+    'dddd4444',
+  );
+  assert.equal(
+    findChecksum(manifest, 'node-v26.5.0-linux-x64.tar.gz'),
+    'aaaa1111',
+  );
 });

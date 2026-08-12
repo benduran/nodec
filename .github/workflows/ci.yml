@@ -41,3 +41,20 @@ jobs:
           go-version: stable
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test:smoke
+
+  # Runs the compiled binaries on barebones distro images. A full distro already
+  # provides the shared libraries node links against, so these failures are
+  # invisible everywhere else -- including on the CI runner itself.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      # arm64 images are pulled alongside amd64 on some hosts; QEMU keeps the
+      # matrix runnable regardless of the runner's architecture.
+      - uses: docker/setup-qemu-action@v3
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test:docker
