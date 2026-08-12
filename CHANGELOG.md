@@ -1,3 +1,11 @@
+## 1.2.1-beta.0 (2026-08-12)
+
+### 🛠️ Fixes 🛠️
+
+- fix: truly generate fully static builds by bundling the deps node normally dynamically-links at runtime on linux platforms. (d004f739d5c05feb15df0845e1ea279d645319c9)
+
+---
+
 ## 1.2.0 (2026-08-10)
 
 ### ✨ Features ✨
