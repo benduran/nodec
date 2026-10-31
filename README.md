@@ -1,3 +1,5 @@
+# This project has moved to Gitlab: https://gitlab.com/stratodyne/nodec
+
 # `@better-builds/nodec`
 The `node compiler (nodec)`, or rather, the unofficial node-application-to-standalone-executable compiler, complete with ESBuild bundling support.
 
